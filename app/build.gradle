@@ -19,8 +19,30 @@ android {
     }
 }
 
+
+repositories {
+    mavenCentral()
+    flatDir {               // Adicionado para usar a Spotify Android SDK:
+        dirs 'libs'
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.+'
+
+    // Dependências Adicionais
+
+
+    // Spotify Web API Wrapper
+    compile ':spotify-web-api-android:0.3.0@aar'
+
+    // SpotifySDK - Autenticação e autorização
+    compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'
+
+    // SpotifySDK - Playback de músicas
+    compile 'com.spotify.sdk:spotify-player:1.0.0-beta12@aar'
+
+
 }
