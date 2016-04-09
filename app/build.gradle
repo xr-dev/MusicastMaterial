@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 'android-N'
+    compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
     defaultConfig {
@@ -31,18 +31,13 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.+'
-
     // Dependências Adicionais
-
-
     // Spotify Web API Wrapper
     compile ':spotify-web-api-android:0.3.0@aar'
-
     // SpotifySDK - Autenticação e autorização
     compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'
-
     // SpotifySDK - Playback de músicas
     compile 'com.spotify.sdk:spotify-player:1.0.0-beta12@aar'
-
-
+    // YouTube Data API v3
+    compile 'com.google.apis:google-api-services-youtube:v3-rev164-1.21.0'
 }
