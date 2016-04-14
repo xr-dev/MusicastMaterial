@@ -24,47 +24,57 @@
             app:expandedTitleMarginEnd="40dp"
             app:title="MusicastMaterial">
 
+            <ImageView
+                android:id="@+id/appbar_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/app_bar_parallax_height"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:gravity="center"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.3"
                 >
 
                 <ImageView
-                    android:id="@+id/appbar_art"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/bg_default_album_art"
-                    android:tint="#11000000"
-                    app:layout_collapseMode="parallax"
-                    app:layout_collapseParallaxMultiplier="0.9"
-                    />
-
-
-                <ImageView
-                    android:id="@+id/backdrop"
-                    android:layout_width="match_parent"
+                    android:id="@+id/art"
+                    android:layout_width="wrap_content"
                     android:layout_height="@dimen/app_bar_image_height"
-                    android:scaleType="centerCrop"
-                    android:fitsSystemWindows="true"
-                    android:layout_marginLeft="@dimen/fragment_margin"
-                    android:layout_marginRight="@dimen/fragment_margin"
-                    app:layout_collapseMode="parallax"
-                    app:layout_collapseParallaxMultiplier="0.5"
+                    android:scaleType="centerInside"
                     android:src="@drawable/bg_default_album_art"
                      />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/fragment_margin"
-                    android:layout_marginRight="@dimen/fragment_margin"
-                    android:textAlignment="center"
-                    app:layout_collapseMode="parallax"
-                    app:layout_collapseParallaxMultiplier="0.9"
-                    android:text="Track Number"
-                    android:textSize="20dp"/>
+
+                <LinearLayout
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/fragment_margin"
+                        android:text="99 Tracks"
+                        android:textSize="14dp"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/fragment_margin"
+                        android:text="105 Followers"
+                        android:textSize="14dp"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/fragment_margin"
+                        android:text="10h35m"
+                        android:textSize="14dp"/>
+
+
+                </LinearLayout>
+
             </LinearLayout>
 
 
