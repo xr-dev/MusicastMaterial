@@ -13,6 +13,7 @@ import com.xrdev.musicastmaterial.R;
 import com.xrdev.musicastmaterial.adapters.PlaylistAdapter;
 import com.xrdev.musicastmaterial.interfaces.OnPlaylistSelectedListener;
 import com.xrdev.musicastmaterial.models.PlaylistModel;
+import com.xrdev.musicastmaterial.utils.DividerItemDecoration;
 
 public class PlaylistsFragment extends Fragment {
 
@@ -71,6 +72,7 @@ public class PlaylistsFragment extends Fragment {
         mPlaylistsRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mPlaylistsRecyclerView.setLayoutManager(mLayoutManager);
+        mPlaylistsRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
         mPlaylistAdapter = new PlaylistAdapter(mListener);
         mPlaylistsRecyclerView.setAdapter(mPlaylistAdapter);
     }
