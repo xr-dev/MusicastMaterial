@@ -24,6 +24,12 @@
             app:expandedTitleMarginEnd="40dp"
             app:title="MusicastMaterial">
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@drawable/shape_scrim"
+                android:layout_gravity="bottom"/>
+
             <ImageView
                 android:id="@+id/appbar_background"
                 android:layout_width="match_parent"
@@ -37,7 +43,7 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.3"
+                app:layout_collapseParallaxMultiplier="0.9"
                 >
 
                 <ImageView
@@ -96,6 +102,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:foreground="@drawable/header_shadow"
         android:layout_marginLeft="@dimen/fragment_margin"
         android:layout_marginRight="@dimen/fragment_margin"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
