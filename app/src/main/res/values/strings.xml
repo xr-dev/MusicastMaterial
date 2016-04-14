@@ -1,3 +1,104 @@
 <resources>
     <string name="app_name">MusicastMaterial</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_playlists">Playlists</string>
+    <string name="title_activity_base">Musicast</string>
+
+    <!-- Menu -->
+    <string name="action_become_host">Become Host</string>
+    <string name="action_stop_hosting">Stop Hosting</string>
+    <string name="action_switch_to_solo">Enter Solo Mode</string>
+    <string name="action_switch_to_party">Host a Party</string>
+    <string name="action_logout">Logout from Spotify</string>
+
+
+    <!-- Keys e protocolos -->
+    <string name="cast_app_id">E7378308</string>
+    <string name="cast_app_id_smr">E3FA9FF0</string>
+    <string name="cast_channel_namespace">urn:x-cast:com.xrdev.musicast</string>
+
+
+    <!-- Demais Strings -->
+    <string name="pd_loading">Loading</string>
+
+    <string name="title_spotify_login">Log in to Spotify</string>
+    <string name="btn_login">LOG IN TO SPOTIFY</string>
+    <string name="btn_skip_login">SKIP LOGIN</string>
+    <string name="login_required_for_admin">To use Solo Mode or Host a Party, you need to login with your Spotify Account.</string>
+    <string name="login_optional_for_guest">To add new tracks to the Play Queue, you need to login with your Spotify Account. \n\n You can skip login authentication and just vote on tracks as a Guest in Party Mode.</string>
+
+    <string name="tracks">" tracks"</string>
+    <string name="videos_found">" videos found"</string>
+
+    <string name="add_all_tracks_to_queue">"Add all tracks"</string>
+    <string name="replace_all_tracks">"Replace all tracks"</string>
+    <string name="title_activity_tracks">Tracks</string>
+
+    <string name="video_not_found">YouTube video not found for this track</string>
+
+    <string name="title_text">Musicast Debug Activity</string>
+
+    <string name="play_pause">Play/Pause</string>
+    <string name="logout_successful">Logged out successfully.</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+
+    <string name="play_queue">PLAY QUEUE</string>
+
+    <string name="btn_solo_mode">SOLO MODE</string>
+    <string name="btn_host_party">HOST PARTY</string>
+    <string name="mode_selection_description">Choose the Musicast Mode. \n\n
+        Solo Mode allows anyone to fully control Musicast. \n\n
+        Party Mode lets you and your friends vote on your favorite tracks and decide together what\'s going to be played.</string>
+    <string name="party_guest_connected">Someone has started a party! \n\n See the Play Queue and vote in your favorite tracks in the slider below. </string>
+    <string name="party_admin_connected">You are the party host! \n\n You have complete control over the Play Queue. </string>
+    <string name="btn_got_it">GOT IT!</string>
+
+    <string name="chromecast_selection_description">Welcome to Musicast!\n\n You need to be connected to a Chromecast to use this app. \n\n Turn on your Chromecast and connect using the menu button. </string>
+
+    <string name="error_no_tracks_on_playlist">No tracks on the selected playlist.</string>
+    <string name="error_not_admin_swap">You are not the host of this party and can\'t swap playlists.</string>
+
+    <string name="string_no_playlists_or_logged_out">No playlists found. \n\n Log in to your Spotify Account. \n Playlists you created or follow will be shown here.</string>
+    <string name="feedback_track_add">Track added to the Play Queue with your vote.</string>
+    <string name="feedback_track_already_on_queue">Vote sent. The selected track was already on the Play Queue.</string>
+    <string name="feedback_error_not_admin">Only the party host is allowed to do this.</string>
+    <string name="feedback_error_has_admin">Someone already has become the Party Host.</string>
+
+    <string name="solo_mode">Solo Mode</string>
+    <string name="party_mode_guest">Party Guest</string>
+    <string name="party_mode_host">Party Host</string>
+    <string name="playlists">Playlists</string>
+
+    <string name="no_admin_on_party">The previous Party Host has disconnected. \n\n Become the new Host or keep connected as a Guest?</string>
+    <string name="btn_become_host">BECOME HOST</string>
+    <string name="btn_stay_as_guest">STAY AS GUEST</string>
+
+    <string name="string_login_required_to_host">To become the Party Host, you need to log in with your Spotify Account.</string>
+
+    <string name="dlg_title_add_tracks">Add all tracks to queue?</string>
+    <string name="dlg_message_add_tracks">Add every music video found on this playlist to the end of the play queue?</string>
+    <string name="dlg_confirm_add_tracks">Add tracks</string>
+
+    <string name="dlg_title_replace_playlist">Replace current playlist?</string>
+    <string name="dlg_message_replace_playlist">Your current play queue and votes sent will be lost.</string>
+    <string name="dlg_confirm_replace_playlist">Swap playlist</string>
+
+    <string name="dlg_title_stop_hosting">Stop Hosting this Party?</string>
+    <string name="dlg_message_stop_hosting">The current tracks will keep playing and anyone will be able to become the new host.</string>
+    <string name="dlg_confirm_stop_hosting">Stop hosting</string>
+
+    <string name="dlg_title_switch_to_solo">Switch to Solo Mode?</string>
+    <string name="dlg_message_switch_to_solo">Your current play queue and votes sent will be lost.</string>
+    <string name="dlg_confirm_switch_to_solo">Switch to Solo Mode</string>
+
+    <string name="dlg_title_switch_to_party">Start Hosting a Party?</string>
+    <string name="dlg_message_switch_to_party">Your current play queue will be lost.</string>
+    <string name="dlg_confirm_switch_to_party">Start hosting</string>
+
+    <string name="dlg_cancel">Cancel</string>
+
 </resources>

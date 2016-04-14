@@ -30,18 +30,21 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.+'
-    compile 'com.android.support:design:23.2.1'
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
     // Dependências Adicionais
-    // Spotify Web API Wrapper
     compile ':spotify-web-api-android:0.3.0@aar'
+    // Spotify Web API Wrapper
     // SpotifySDK - Autenticação e autorização
-    compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'
     // SpotifySDK - Playback de músicas
-    compile 'com.spotify.sdk:spotify-player:1.0.0-beta12@aar'
     // YouTube Data API v3
-    compile 'com.google.apis:google-api-services-youtube:v3-rev164-1.21.0'
     // CastCompanionLibrary
-    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.8.3'
+    // ShowCaseMaterial
 
+    compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'
+    compile 'com.spotify.sdk:spotify-player:1.0.0-beta12@aar'
+    compile 'com.google.apis:google-api-services-youtube:v3-rev164-1.21.0'
+    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.8.3'
+    compile 'com.github.deano2390:MaterialShowcaseView:1.1.0'
+    compile 'com.android.support:support-v4:23.3.0'
 }
