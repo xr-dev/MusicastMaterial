@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/background_material_dark_musicast</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDarkTransparent</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -17,5 +18,17 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light" >
+        <item name="colorPrimary">@color/light_colorPrimary</item>
+        <item name="colorPrimaryDark">@color/light_colorPrimaryDark</item>
+        <item name="colorAccent">@color/light_colorAccent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="AppThemeLight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
 </resources>

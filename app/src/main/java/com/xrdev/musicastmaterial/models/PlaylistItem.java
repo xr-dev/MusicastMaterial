@@ -3,13 +3,13 @@ package com.xrdev.musicastmaterial.models;
 /**
  * Created by Guilherme on 11/04/2016.
  */
-public class PlaylistModel {
+public class PlaylistItem {
     private String name;
     private int numTracks;
     private String playlistId;
     private String ownerId;
 
-    public PlaylistModel(String name, int numTracks, String playlistId, String ownerId) {
+    public PlaylistItem(String name, int numTracks, String playlistId, String ownerId) {
         this.name = name;
         this.numTracks = numTracks;
         this.playlistId = playlistId;

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import com.xrdev.musicastmaterial.R;
 import com.xrdev.musicastmaterial.adapters.PlaylistAdapter;
 import com.xrdev.musicastmaterial.interfaces.OnPlaylistSelectedListener;
-import com.xrdev.musicastmaterial.models.PlaylistModel;
+import com.xrdev.musicastmaterial.models.PlaylistItem;
 import com.xrdev.musicastmaterial.utils.DividerItemDecoration;
 
 public class PlaylistsFragment extends Fragment {
@@ -79,7 +79,7 @@ public class PlaylistsFragment extends Fragment {
 
     private void loadPlaylists(){
         for (int i = 0; i < 30; i++){
-            mPlaylistAdapter.add(new PlaylistModel("Debug " + i, 99, "idteste", "ownerid"));
+            mPlaylistAdapter.add(new PlaylistItem("Debug " + i, 99, "idteste", "ownerid"));
         }
     }
 

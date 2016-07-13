@@ -3,10 +3,11 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
-    <dimen name="app_bar_tracks_height">256dp</dimen>
-    <dimen name="app_bar_parallax_height">170dp</dimen>
-    <dimen name="app_bar_image_height">150dp</dimen>
+    <dimen name="app_bar_tracks_height">300dp</dimen>
+    <dimen name="app_bar_collapsible_height">230dp</dimen>
+    <dimen name="app_bar_image_height">180dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    <dimen name="fragment_margin">6dp</dimen>
+    <dimen name="fragment_margin">16dp</dimen>
+    <dimen name="bottom_sheet_peek_height">60dp</dimen>
 </resources>

@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.xrdev.musicastmaterial.R;
 import com.xrdev.musicastmaterial.interfaces.OnPlaylistSelectedListener;
-import com.xrdev.musicastmaterial.models.PlaylistModel;
+import com.xrdev.musicastmaterial.models.PlaylistItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> {
 
-    private List<PlaylistModel> mPlaylists = new ArrayList<PlaylistModel>();
+    private List<PlaylistItem> mPlaylists = new ArrayList<PlaylistItem>();
     private final static String TAG = "PlaylistAdapter";
     OnPlaylistSelectedListener mListener; // Callback para Activity
 
@@ -37,7 +37,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
          * @param item Item a popular as Views
          * @param listener Listener que receberá os eventos (na BaseActivity)
          */
-        public void bind(final PlaylistModel item, final OnPlaylistSelectedListener listener){
+        public void bind(final PlaylistItem item, final OnPlaylistSelectedListener listener){
             this.titleView.setText(item.getName());
             this.tracksView.setText(item.getNumTracks());
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +81,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
 
 
     // Adiciona um item a lista
-    public void add(PlaylistModel item) {
+    public void add(PlaylistItem item) {
         mPlaylists.add(item);
         notifyDataSetChanged();
     }

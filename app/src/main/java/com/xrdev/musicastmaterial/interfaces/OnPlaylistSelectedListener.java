@@ -1,6 +1,6 @@
 package com.xrdev.musicastmaterial.interfaces;
 
-import com.xrdev.musicastmaterial.models.PlaylistModel;
+import com.xrdev.musicastmaterial.models.PlaylistItem;
 
 /**
  * This interface must be implemented by activities that contain this
@@ -13,5 +13,5 @@ import com.xrdev.musicastmaterial.models.PlaylistModel;
  * >Communicating with Other Fragments</a> for more information.
  */
 public interface OnPlaylistSelectedListener {
-    public void onPlaylistSelected(PlaylistModel clickedPlaylist);
+    public void onPlaylistSelected(PlaylistItem clickedPlaylist);
 }
