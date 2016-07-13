@@ -53,5 +53,7 @@ dependencies {
     compile 'jp.wasabeef:glide-transformations:2.0.0'
     // FloatingActionButton
     compile 'com.github.clans:fab:1.6.3'
+    // Joda Time
+    compile 'net.danlew:android.joda:2.9.4.1'
 
 }

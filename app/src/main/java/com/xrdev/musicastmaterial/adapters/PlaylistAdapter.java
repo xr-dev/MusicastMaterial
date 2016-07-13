@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.xrdev.musicastmaterial.R;
-import com.xrdev.musicastmaterial.interfaces.OnPlaylistSelectedListener;
+import com.xrdev.musicastmaterial.interfaces.IPlaylist;
 import com.xrdev.musicastmaterial.models.PlaylistItem;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
 
     private List<PlaylistItem> mPlaylists = new ArrayList<PlaylistItem>();
     private final static String TAG = "PlaylistAdapter";
-    OnPlaylistSelectedListener mListener; // Callback para Activity
+    IPlaylist mListener; // Callback para Activity
 
     class PlaylistHolder extends RecyclerView.ViewHolder {
         TextView titleView;
@@ -37,7 +37,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
          * @param item Item a popular as Views
          * @param listener Listener que receberá os eventos (na BaseActivity)
          */
-        public void bind(final PlaylistItem item, final OnPlaylistSelectedListener listener){
+        public void bind(final PlaylistItem item, final IPlaylist listener){
             this.titleView.setText(item.getName());
             this.tracksView.setText(item.getNumTracks());
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -49,7 +49,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         }
     }
 
-    public PlaylistAdapter(OnPlaylistSelectedListener listener) {
+    public PlaylistAdapter(IPlaylist listener) {
         mListener = listener;
     }
 

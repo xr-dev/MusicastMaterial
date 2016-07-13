@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import com.xrdev.musicastmaterial.R;
 import com.xrdev.musicastmaterial.adapters.PlaylistAdapter;
-import com.xrdev.musicastmaterial.interfaces.OnPlaylistSelectedListener;
+import com.xrdev.musicastmaterial.interfaces.IPlaylist;
 import com.xrdev.musicastmaterial.models.PlaylistItem;
 import com.xrdev.musicastmaterial.utils.DividerItemDecoration;
 
@@ -22,7 +22,7 @@ public class PlaylistsFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager; // LayoutManager da RV.
     private PlaylistAdapter mPlaylistAdapter; // Adapter que distribuirá os dados do modelo na lista
 
-    OnPlaylistSelectedListener mListener; // Callback para Activity
+    IPlaylist mListener; // Callback para Activity
 
 
     public PlaylistsFragment() {
@@ -52,11 +52,11 @@ public class PlaylistsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnPlaylistSelectedListener) {
-            mListener = (OnPlaylistSelectedListener) context;
+        if (context instanceof IPlaylist) {
+            mListener = (IPlaylist) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement IPlaylist");
         }
     }
 
@@ -75,6 +75,7 @@ public class PlaylistsFragment extends Fragment {
         mPlaylistsRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
         mPlaylistAdapter = new PlaylistAdapter(mListener);
         mPlaylistsRecyclerView.setAdapter(mPlaylistAdapter);
+        mPlaylistsRecyclerView.setNestedScrollingEnabled(false);
     }
 
     private void loadPlaylists(){

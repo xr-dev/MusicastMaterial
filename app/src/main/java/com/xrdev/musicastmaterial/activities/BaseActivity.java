@@ -7,7 +7,7 @@ import android.animation.ObjectAnimator;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.app.Activity;
-import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -19,24 +19,31 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.github.clans.fab.FloatingActionMenu;
 import com.xrdev.musicastmaterial.R;
-import com.xrdev.musicastmaterial.interfaces.OnPlaylistSelectedListener;
+import com.xrdev.musicastmaterial.fragments.TracksFragment;
+import com.xrdev.musicastmaterial.interfaces.IPlaylist;
 import com.xrdev.musicastmaterial.fragments.PlaylistsFragment;
+import com.xrdev.musicastmaterial.interfaces.ITrack;
 import com.xrdev.musicastmaterial.models.PlaylistItem;
+import com.xrdev.musicastmaterial.models.TrackItem;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
-public class BaseActivity extends Activity implements OnPlaylistSelectedListener {
+public class BaseActivity extends Activity implements IPlaylist, ITrack {
 
     int BLUR_RADIUS = 175;
     FragmentManager mFragmentManager;
     PlaylistsFragment mPlaylistsFragment;
+    TracksFragment mTracksFragment;
     CollapsingToolbarLayout mCollapsingToolbarLayout;
+    AppBarLayout mAppBarLayout;
     ImageView mToolbarBackground;
     ImageView mToolbarArt;
     CoordinatorLayout mCoordinatorLayout;
     FloatingActionMenu menuFab;
-    BottomSheetBehavior<FrameLayout> mBottomSheetBehavior;
+    FrameLayout mFrameContainer;
     FrameLayout mMiniPlayer;
+
+    PlaylistItem mPlaylistSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,7 @@ public class BaseActivity extends Activity implements OnPlaylistSelectedListener
         findViews();
         initFragments();
         setupMenuFabAnim();
+        collapseToolbar();
 
     }
 
@@ -55,10 +63,9 @@ public class BaseActivity extends Activity implements OnPlaylistSelectedListener
         mToolbarBackground = (ImageView) findViewById(R.id.appbar_background);
         mToolbarArt = (ImageView) findViewById(R.id.appbar_art);
         menuFab = (FloatingActionMenu) findViewById(R.id.menu_fab);
+        mFrameContainer = (FrameLayout) findViewById(R.id.frame_container);
         mMiniPlayer = (FrameLayout) findViewById(R.id.mini_player);
-
-
-
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
     }
 
     public void initFragments(){
@@ -68,11 +75,32 @@ public class BaseActivity extends Activity implements OnPlaylistSelectedListener
             mPlaylistsFragment = PlaylistsFragment.newInstance();
         }
 
+        if (mTracksFragment == null) {
+            mTracksFragment = TracksFragment.newInstance();
+        }
+
         /**
          * TODO: alterar toda essa parte para inicializar o fragment correto, este código deve estar em outro método específico para o PlaylistsFragment.
          */
-        onPlaylistSelected();
+        loadPlaylists();
 
+    }
+
+    @Override
+    public void onBackPressed(){
+        if (mFragmentManager.getBackStackEntryCount() > 0) {
+            mFragmentManager.popBackStack();
+            menuFab.setVisibility(View.GONE);
+            mCollapsingToolbarLayout.setTitle("Musicast");
+            collapseToolbar();
+        } else {
+            //super.onBackPressed();
+            this.moveTaskToBack(true);
+        }
+    }
+
+    public void collapseToolbar() {
+        mAppBarLayout.setExpanded(false, false);
     }
 
     public void setupMenuFabAnim() {
@@ -107,24 +135,26 @@ public class BaseActivity extends Activity implements OnPlaylistSelectedListener
 
     }
 
-    public void onPlaylistSelected(PlaylistItem playlist){
-        Snackbar.make(mCoordinatorLayout, "Playlist selecionada " + playlist.getName(), Snackbar.LENGTH_LONG).show();
-    }
-
     /**
-     * Configura interface e toolbar (título, fundo e botões) para a View de tracks de uma playlist.
+     * Trata a seleção de uma Playlist no RecyclerView do PlaylistFragment.
+     * @param playlist
      */
-    private void onPlaylistSelected(){
+    public void onPlaylistSelected(PlaylistItem playlist){
+        Snackbar.make(mCoordinatorLayout, "DEBUG: Playlist selecionada " + playlist.getName(), Snackbar.LENGTH_LONG).show();
+        mPlaylistSelected = playlist;
 
-        /**
-         * Configurar toolbar
-         */
-        mCollapsingToolbarLayout.setTitle("Playlist Name");
+        if (mTracksFragment == null) {
+            mTracksFragment = TracksFragment.newInstance();
+        }
 
         mFragmentManager.beginTransaction()
-                .replace(R.id.frame_container, mPlaylistsFragment)
+                .replace(R.id.frame_container, mTracksFragment)
+                .addToBackStack(null)
                 .commit();
 
+        menuFab.setVisibility(View.VISIBLE);
+        mCollapsingToolbarLayout.setTitle(mPlaylistSelected.getName());
+        mAppBarLayout.setExpanded(true, false);
 
         Glide.with(this)
                 .load("https://mosaic.scdn.co/640/134cd5ccaef9d411eba33df9542db9ba731aaf98c4b4399d9b7c6f61b6a6ee70c616bc1a985c7ab8e337f3661f68bc4d96a554de0ad7988d65edb25aec04f9acee17a7576f939eb5aa317d20c6322494")
@@ -134,6 +164,42 @@ public class BaseActivity extends Activity implements OnPlaylistSelectedListener
                 .load("https://mosaic.scdn.co/640/134cd5ccaef9d411eba33df9542db9ba731aaf98c4b4399d9b7c6f61b6a6ee70c616bc1a985c7ab8e337f3661f68bc4d96a554de0ad7988d65edb25aec04f9acee17a7576f939eb5aa317d20c6322494")
                 .bitmapTransform(new BlurTransformation(this, BLUR_RADIUS))
                 .into(mToolbarBackground);
+    }
+
+    /**
+     * Trata da seleção de uma Track no RecyclerView do TrackFragment.
+     * Este método é executado quando o usuário toca na linha da música e iniciará a reprodução da
+     * Playlist carregada na música selecionada. Funciona apenas no Modo Solo.
+     * @param track
+     */
+    public void onTrackSelected(TrackItem track) {
+        Snackbar.make(mCoordinatorLayout, "DEBUG: Track SELECIONADA: " + track.getName(), Snackbar.LENGTH_LONG).show();
+    }
+
+    /**
+     * Trata da interação do usuário com o botão de "Adicionar Música". Funciona no Modo Festa.
+     * @param track
+     */
+    public void onTrackAdded(TrackItem track) {
+        Snackbar.make(mCoordinatorLayout, "DEBUG: Track ADICIONADA: " + track.getName(), Snackbar.LENGTH_LONG).show();
+    }
+
+    /**
+     * Configura interface e toolbar (título, fundo e botões) para a View de tracks de uma playlist.
+     */
+    private void loadPlaylists(){
+
+        /**
+         * Configurar toolbar
+         */
+        mCollapsingToolbarLayout.setTitle("Musicast");
+
+        mFragmentManager.beginTransaction()
+                .replace(R.id.frame_container, mPlaylistsFragment)
+                .commit();
+
+        menuFab.setVisibility(View.GONE);
+
 
     }
 }

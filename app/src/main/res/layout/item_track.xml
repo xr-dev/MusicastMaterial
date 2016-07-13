@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/text_track_name"
+        android:textColor="#aaa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Track Name"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:maxLines="1"
+        android:ellipsize="marquee"
+        android:layout_marginLeft="10dp"
+        android:layout_toLeftOf="@+id/container_track_button"
+        android:layout_toStartOf="@+id/container_track_button"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Artist Name + Album"
+        android:id="@+id/text_track_artists"
+        android:layout_below="@+id/text_track_name"
+        android:textColor="#aaa"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_toLeftOf="@+id/container_track_button"
+        android:layout_toStartOf="@+id/container_track_button"
+        android:layout_marginLeft="10dp" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pbar_youtube_fetch"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp" />
+
+
+
+    <RelativeLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/container_track_button"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp">
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/button_track_add"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/ic_action_add_circle"
+            android:contentDescription="@string/add_all_tracks_to_queue" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

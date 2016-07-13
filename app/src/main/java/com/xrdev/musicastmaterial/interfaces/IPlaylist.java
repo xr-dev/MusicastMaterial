@@ -12,6 +12,6 @@ import com.xrdev.musicastmaterial.models.PlaylistItem;
  * "http://developer.android.com/training/basics/fragments/communicating.html"
  * >Communicating with Other Fragments</a> for more information.
  */
-public interface OnPlaylistSelectedListener {
+public interface IPlaylist {
     public void onPlaylistSelected(PlaylistItem clickedPlaylist);
 }
