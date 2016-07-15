@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="?android:attr/actionBarSize">
+
+    <!-- Fim do layout da toolbar -->
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foreground="@drawable/header_shadow"
+        android:layout_marginLeft="@dimen/fragment_margin"
+        android:layout_marginRight="@dimen/fragment_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:id="@+id/frame_container">
+
+    </FrameLayout>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/menu_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        fab:menu_icon="@drawable/ic_action_toc"
+        app:layout_behavior="com.xrdev.musicastmaterial.utils.FloatingActionMenuBehavior">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_item_playlist_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_av_playlist_add"
+            fab:fab_size="mini"
+            fab:fab_label="Debug Menu 1 - Add Playlist to Queue" />
+    </com.github.clans.fab.FloatingActionMenu>
+</android.support.design.widget.CoordinatorLayout>

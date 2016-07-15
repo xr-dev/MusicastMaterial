@@ -57,6 +57,9 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack {
 
     }
 
+    /**
+     * Inicialização das Views - bind dos elementos de layout com os objetos
+     */
     public void findViews(){
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_content);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -64,10 +67,12 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack {
         mToolbarArt = (ImageView) findViewById(R.id.appbar_art);
         menuFab = (FloatingActionMenu) findViewById(R.id.menu_fab);
         mFrameContainer = (FrameLayout) findViewById(R.id.frame_container);
-        mMiniPlayer = (FrameLayout) findViewById(R.id.mini_player);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
     }
 
+    /**
+     * Inicialização dos Fragments
+     */
     public void initFragments(){
         mFragmentManager = getFragmentManager();
 
@@ -103,6 +108,9 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack {
         mAppBarLayout.setExpanded(false, false);
     }
 
+    /**
+     * Configura a animação customizada do Floating Action Button.
+     */
     public void setupMenuFabAnim() {
 
         AnimatorSet set = new AnimatorSet();
@@ -143,6 +151,9 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack {
         Snackbar.make(mCoordinatorLayout, "DEBUG: Playlist selecionada " + playlist.getName(), Snackbar.LENGTH_LONG).show();
         mPlaylistSelected = playlist;
 
+        /**
+         * ATUALIZAÇÃO DA INTERFACE
+         */
         if (mTracksFragment == null) {
             mTracksFragment = TracksFragment.newInstance();
         }

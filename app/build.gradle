@@ -41,8 +41,12 @@ dependencies {
     compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'
     // SpotifySDK - Playback de músicas
     compile 'com.spotify.sdk:spotify-player:1.0.0-beta12@aar'
+
     // YouTube Data API v3
     compile 'com.google.apis:google-api-services-youtube:v3-rev164-1.21.0'
+
+    // Umano SlidingUpPanel
+    compile 'com.sothree.slidinguppanel:library:3.3.0'
     // CastCompanionLibrary
     compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.8.3'
     // ShowCaseMaterial

@@ -30,9 +30,9 @@ public class FloatingActionMenuBehavior extends CoordinatorLayout.Behavior {
             return true;
         }
         // TODO: verificar como checar o bottomsheet
-        if (dependency.getId() == R.id.mini_player){
+        /*if (dependency.getId() == R.id.mini_player){
             return true;
-        }
+        }*/
         return false;
     }
 
@@ -40,7 +40,7 @@ public class FloatingActionMenuBehavior extends CoordinatorLayout.Behavior {
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
 
         if (child instanceof FloatingActionMenu &&
-                (dependency instanceof Snackbar.SnackbarLayout) || (dependency.getId() == R.id.mini_player)) {
+                (dependency instanceof Snackbar.SnackbarLayout) /*|| (dependency.getId() == R.id.mini_player)*/) {
             this.updateTranslation(parent, child, dependency);
         }
 
@@ -75,10 +75,10 @@ public class FloatingActionMenuBehavior extends CoordinatorLayout.Behavior {
             if (view instanceof Snackbar.SnackbarLayout && parent.doViewsOverlap(child, view)) {
                 minOffset = Math.min(minOffset, ViewCompat.getTranslationY(view) - (float) view.getHeight());
             }
-            if (view.getId() == R.id.mini_player && parent.doViewsOverlap(child, view)) {
+/*            if (*//*view.getId() == R.id.mini_player &&*//* parent.doViewsOverlap(child, view)) {
                 BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(view);
                 minOffset = Math.min(minOffset, ViewCompat.getTranslationY(view) - (float) mBottomSheetBehavior.getPeekHeight());
-            }
+            }*/
         }
 
         return minOffset;
