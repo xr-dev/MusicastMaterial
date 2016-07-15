@@ -41,7 +41,6 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack {
     CoordinatorLayout mCoordinatorLayout;
     FloatingActionMenu menuFab;
     FrameLayout mFrameContainer;
-    FrameLayout mMiniPlayer;
 
     PlaylistItem mPlaylistSelected;
 
@@ -165,7 +164,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack {
 
         menuFab.setVisibility(View.VISIBLE);
         mCollapsingToolbarLayout.setTitle(mPlaylistSelected.getName());
-        mAppBarLayout.setExpanded(true, false);
+        mAppBarLayout.setExpanded(true, true);
 
         Glide.with(this)
                 .load("https://mosaic.scdn.co/640/134cd5ccaef9d411eba33df9542db9ba731aaf98c4b4399d9b7c6f61b6a6ee70c616bc1a985c7ab8e337f3661f68bc4d96a554de0ad7988d65edb25aec04f9acee17a7576f939eb5aa317d20c6322494")

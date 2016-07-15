@@ -4,11 +4,13 @@
     <color name="colorPrimaryDark">#141517</color>
     <color name="colorPrimaryDarkTransparent">#dc141517</color>
     <color name="colorAccent">#ff4545</color>
-    <color name="colorAccentGreen">#11b200</color>
+    <color name="colorAccent2">#448AFF</color>
     <color name="background_material_dark_musicast">#121314</color>
 
     <color name="light_colorPrimary">#73c729</color>
     <color name="light_colorPrimaryDark">#2b6912</color>
     <color name="light_colorAccent">#536DFE</color>
+
+    <color name="text_disabled">#aaa</color>
 
 </resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.sothree.slidinguppanel.SlidingUpPanelLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:sothree="http://schemas.android.com/lib/com.sothree.slidinguppanel"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
     android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    sothree:panelHeight="60dp"
-    sothree:shadowHeight="4dp">
+    sothree:umanoPanelHeight="@dimen/sliding_panel_height"
+    sothree:umanoShadowHeight="4dp">
 
     <include layout="@layout/layout_content_collapsing"/>
     <include layout="@layout/layout_player"/>
