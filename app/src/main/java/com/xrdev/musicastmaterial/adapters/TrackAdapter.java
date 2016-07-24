@@ -48,7 +48,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder>
              * Configuração de texto:
              */
             this.titleView.setText(item.getName());
-            this.artistsView.setText(item.getArtists() + " - " + item.getAlbum());
+            this.artistsView.setText(item.getArtists() + " • " + item.getAlbum());
 
 
             /**

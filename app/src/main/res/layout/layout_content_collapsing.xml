@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_tracks_height"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_behavior="com.xrdev.musicastmaterial.utils.FlingBehavior"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
