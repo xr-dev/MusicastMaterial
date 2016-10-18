@@ -21,7 +21,8 @@ allprojects {
 }
 
 ext {
-    supportLibVersion = '23.3.0'  // variable that can be referenced to keep support libs consistent
+    supportLibVersion = '24.1.1'  // Variável para manter a consistência das libs de suporte
+    // NÃO ALTERAR ESTA MERDA A MENOS QUE EXTREMAMENTE NECESSÁRIO, O GOOGLE ADORA INCLUIR BUGS NOVOS
 }
 
 task clean(type: Delete) {

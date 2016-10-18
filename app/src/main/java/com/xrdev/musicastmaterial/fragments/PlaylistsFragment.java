@@ -56,7 +56,7 @@ public class PlaylistsFragment extends Fragment {
             mListener = (IPlaylist) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement IPlaylist");
+                    + " must implement ILogin");
         }
     }
 

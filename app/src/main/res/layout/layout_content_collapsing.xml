@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_tracks_height"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_behavior="com.xrdev.musicastmaterial.utils.FlingBehavior"
-        android:fitsSystemWindows="true">
+        app:layout_behavior="com.xrdev.musicastmaterial.utils.FlingBehavior">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -69,8 +68,6 @@
 
     <!-- Fim do layout da toolbar -->
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -97,7 +94,6 @@
         </FrameLayout>
 
     </LinearLayout>
-
 
 
 
