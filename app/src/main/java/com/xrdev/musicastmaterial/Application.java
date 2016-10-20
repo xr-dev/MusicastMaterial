@@ -9,7 +9,11 @@ import com.xrdev.musicastmaterial.utils.DatabaseHandler;
  */
 public class Application extends android.app.Application {
 
+    // Glide -- imagens
+    public static final int GLIDE_BLUR_RADIUS = 175;
+
     private static DatabaseHandler mDatabaseHandler;
+
 
     public static DatabaseHandler getDbHandler(Context context) {
         if (mDatabaseHandler == null) {

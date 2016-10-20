@@ -32,7 +32,7 @@
         app:layout_behavior="com.xrdev.musicastmaterial.utils.FloatingActionMenuBehavior">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/menu_item_playlist_add"
+            android:id="@+id/fab_add_pl_to_queue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_av_playlist_add"

@@ -63,6 +63,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             trackItem.setYoutubeId(cursor.getString(0));
             trackItem.setRefreshCacheDate(cursor.getString(1));
             trackItem.wasCached = true;
+            cursor.close();
         }
 
         return trackItem;

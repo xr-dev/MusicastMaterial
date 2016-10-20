@@ -2,17 +2,6 @@ package com.xrdev.musicastmaterial.apis;
 
 import android.content.Context;
 import android.util.Log;
-
-import com.spotify.sdk.android.authentication.AuthenticationClient;
-import com.wrapper.spotify.Api;
-import com.wrapper.spotify.methods.PlaylistTracksRequest;
-import com.wrapper.spotify.methods.UserPlaylistsRequest;
-import com.wrapper.spotify.models.AuthorizationCodeCredentials;
-import com.wrapper.spotify.models.Page;
-import com.wrapper.spotify.models.PlaylistTrack;
-import com.wrapper.spotify.models.RefreshAccessTokenCredentials;
-import com.wrapper.spotify.models.SimplePlaylist;
-import com.wrapper.spotify.models.User;
 import com.xrdev.musicastmaterial.Application;
 import com.xrdev.musicastmaterial.models.PlaylistItem;
 import com.xrdev.musicastmaterial.models.Token;
@@ -21,45 +10,68 @@ import com.xrdev.musicastmaterial.utils.DatabaseHandler;
 import com.xrdev.musicastmaterial.utils.PrefsManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Pager;
+import kaaes.spotify.webapi.android.models.PlaylistSimple;
+import kaaes.spotify.webapi.android.models.PlaylistTrack;
+import kaaes.spotify.webapi.android.models.Track;
 
 /**
  * Created by Guilherme on 22/07/2014.
  */
 public class SpotifyManager {
     // IDs:
-    public static final String TAG = "SpotifyHandler";
+    public static final String TAG = "SpotifyManager";
     public static final String CLIENT_ID = "befa95e4d007494ea40efcdbd3e1fff7";
     public static final String REDIRECT_URI = "musicast://callback";
     public static final String CLIENT_SECRET = "cffb5db7d8eb4910b3a95527fcee6899";
     public static final int REQUEST_CODE = 9000;
 
     // Api:
-    private static Api api = Api.builder()
-            .clientId(CLIENT_ID)
-            .clientSecret(CLIENT_SECRET)
-            .redirectURI(REDIRECT_URI)
-            .build();
+    private SpotifyApi api;
+    private SpotifyService apiService;
+    private String accessToken;
 
+    // Misc:
+    DatabaseHandler dbHandler;
 
-    public static ArrayList<TrackItem> getPlaylistTracks(PlaylistItem playlist, int limit, int offset, Context context) {
-        User currentUser = getCurrentUser(context);
-        DatabaseHandler dbHandler = Application.getDbHandler(context);
+    public SpotifyManager(Context context){
+        api = new SpotifyApi();
+        apiService = api.getService();
+        dbHandler = Application.getDbHandler(context);
+    }
+
+    public void setAccessToken(Token token){
+        this.accessToken = token.getAccessString();
+    }
+
+    public ArrayList<TrackItem> getPlaylistTracks(PlaylistItem playlist, int limit, int offset) {
+        if (accessToken == null)
+            return null;
+
         int totalTracks = playlist.getNumTracksInt();
         ArrayList<TrackItem> result = new ArrayList<TrackItem>();
 
-        final PlaylistTracksRequest request = api.getPlaylistTracks(playlist.getOwnerId(), playlist.getPlaylistId())
-                .limit(limit)
-                .offset(offset)
-                .build();
+        Map<String, Object> options = new HashMap<>();
+        options.put(SpotifyService.OFFSET, offset);
+        options.put(SpotifyService.LIMIT, limit);
+
 
         Log.d(TAG, "Total tracks:" + totalTracks);
-        Log.d(TAG, "PlaylistRequest: " + request.toStringWithQueryParameters());
         try {
-            final Page<PlaylistTrack> tracksPage = request.get();
-            for (PlaylistTrack playlistTrack : tracksPage.getItems()) {
-
+            final Pager<PlaylistTrack> tracksPage =
+                    apiService.getPlaylistTracks(
+                            playlist.getOwnerId(),
+                            playlist.getPlaylistId(),
+                            options
+                    );
+            for (PlaylistTrack playlistTrack : tracksPage.items) {
                 TrackItem trackItem = dbHandler.checkForMatch(
-                        new TrackItem(playlistTrack.getTrack())
+                        new TrackItem(playlistTrack.track)
                 );
                 result.add(trackItem);
             }
@@ -71,25 +83,36 @@ public class SpotifyManager {
         return result;
     }
 
-    public static ArrayList<PlaylistItem> getUserPlaylists(Context context) {
-        User currentUser = getCurrentUser(context);
+    public int getUserPlaylistsCount() {
+        int count = 0;
+        if (accessToken == null)
+            return 0;
+        try {
+            api.setAccessToken(accessToken);
+            count = apiService.getMyPlaylists().total;
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao obter listas de reprodução do usuário. / Unable to get user playlists. Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    public ArrayList<PlaylistItem> getUserPlaylists(int limit, int offset) {
+        ArrayList<PlaylistItem> result = new ArrayList<>();
         // Nenhum usuário atual, não retornar nenhuma playlist.
-        if (currentUser == null)
-            // TODO: Usuário não conectado. Rever a lógica.
+        if (accessToken == null)
             return null;
 
-        ArrayList<PlaylistItem> result = new ArrayList<PlaylistItem>();
-        final UserPlaylistsRequest request = api.getPlaylistsForUser(currentUser.getId()).build();
+        Map<String, Object> options = new HashMap<>();
+        options.put(SpotifyService.OFFSET, offset);
+        options.put(SpotifyService.LIMIT, limit);
+
         try {
-            final Page<SimplePlaylist> playlistsPage = request.get();
+            api.setAccessToken(accessToken);
+            final Pager<PlaylistSimple> playlistsPage = apiService.getMyPlaylists(options);
 
-            for (SimplePlaylist playlist : playlistsPage.getItems()) {
-
-                String name = playlist.getName();
-                int numTracks = playlist.getTracks().getTotal();
-                String playlistId = playlist.getId();
-                String ownerId = playlist.getOwner().getId();
-                result.add(new PlaylistItem(name, numTracks, playlistId, ownerId));
+            for (PlaylistSimple playlist : playlistsPage.items) {
+                result.add(new PlaylistItem(playlist));
             }
         } catch (Exception e) {
             Log.e(TAG, "Erro ao obter listas de reprodução do usuário. / Unable to get user playlists. Error: " + e.getMessage());
@@ -98,71 +121,30 @@ public class SpotifyManager {
         return result;
     }
 
-    public static User getCurrentUser(Context context) {
-        try {
-            Log.d(TAG, "Obtendo token válido para transação da API. / Obtaining valid token for API transaction.");
-            Token token = PrefsManager.getValidToken(context);
-
-            if (token == null) {
-                Log.d(TAG, "Não foi possível obter um token válido. / Unable to obtain valid token.");
-                return null;
-            } else {
-                String accessString = token.getAccessString();
-                api.setAccessToken(accessString);
-                Log.d(TAG, "Access token obtido pelo getCurrentUser(): / Access token obtained on getCurrentUser(): " + accessString);
-                return api.getMe().accessToken(accessString).build().get();
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "EXCEPTION: Não foi possível obter os dados do usuário atual. / Unable to get data about current user. Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void setAuthCredentials(Context context) {
-        try {
-
-            String code = PrefsManager.getCodeFromPrefs(context);
-            AuthorizationCodeCredentials authorizationCodeCredentials = api.authorizationCodeGrant(code).build().get();
-            Token token = new Token(authorizationCodeCredentials);
-            if (token == null || token.getAccessString() == null) {
-                Log.e(TAG, "Não foi possível obter tokens pelo AuthorizationCodeCredentials. / Unable to get tokens via AuthorizationCodeCredentials");
-            } else {
-                Log.d(TAG, "Token obtido pelo AuthorizationCodeCredentials: / Token obtained via AuthenticationCodeCredentials:  " + token.getAccessString());
-                Log.d(TAG, "Refresh Token obtido pelo AuthorizationCodeCredentials: / Refresh Token obtained via AuthenticationCodeCredentials:  " + token.getRefreshString());
-                PrefsManager.setTokenToPrefs(context, token);
-            }
-        } catch (Exception e) {
-            Log.e(TAG,"Não foi possível fazer login à Web API. / Unable to login to Web API. Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    public static Token getRefreshedToken(Context context) {
-        try {
-            Log.d(TAG, "Token expirado, atualizando token... / Token expired, refreshing token...");
-
-            Token currentToken = PrefsManager.getTokenFromPrefs(context);
-
-            api.setAccessToken(currentToken.getAccessString());
-            api.setRefreshToken(currentToken.getRefreshString());
-
-            RefreshAccessTokenCredentials refreshRequest = api.refreshAccessToken().build().get();
-            String refreshedAccessToken = refreshRequest.getAccessToken();
-
-            if (refreshedAccessToken == null) {
-                Log.e(TAG, "Não foi possível obter o token atualizado pelo RefreshAccessTokenCredentials. / Unable to get refreshed token via RefreshAccessTokenCredentials.");
-                return null;
-            } else {
-                Log.d(TAG,"Token atualizado pelo RefreshAccessTokenCredentials: / Refreshed token obtained via RefreshAccessTokenCredentials: " + refreshedAccessToken);
-                return new Token(refreshedAccessToken, currentToken.getRefreshString(), refreshRequest.getExpiresIn());
-            }
-        } catch (Exception e) {
-            Log.e(TAG,"Exception: Não foi possível atualizar o access token. / Unable to refresh access token. " );
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    public static Token getRefreshedToken(Context context) {
+//        try {
+//            Log.d(TAG, "Token expirado, atualizando token... / Token expired, refreshing token...");
+//
+//            Token currentToken = PrefsManager.getTokenFromPrefs(context);
+//
+//            api.setAccessToken(currentToken.getAccessString());
+//            api.setRefreshToken(currentToken.getRefreshString());
+//
+//            RefreshAccessTokenCredentials refreshRequest = api.refreshAccessToken().build().get();
+//            String refreshedAccessToken = refreshRequest.getAccessToken();
+//
+//            if (refreshedAccessToken == null) {
+//                Log.e(TAG, "Não foi possível obter o token atualizado pelo RefreshAccessTokenCredentials. / Unable to get refreshed token via RefreshAccessTokenCredentials.");
+//                return null;
+//            } else {
+//                Log.d(TAG,"Token atualizado pelo RefreshAccessTokenCredentials: / Refreshed token obtained via RefreshAccessTokenCredentials: " + refreshedAccessToken);
+//                return new Token(refreshedAccessToken, currentToken.getRefreshString(), refreshRequest.getExpiresIn());
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG,"Exception: Não foi possível atualizar o access token. / Unable to refresh access token. " );
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
 }

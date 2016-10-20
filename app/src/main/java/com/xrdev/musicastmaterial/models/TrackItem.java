@@ -1,8 +1,5 @@
 package com.xrdev.musicastmaterial.models;
 
-import com.wrapper.spotify.models.SimpleArtist;
-import com.wrapper.spotify.models.Track;
-
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -10,6 +7,12 @@ import org.joda.time.format.ISODateTimeFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistSimple;
+import kaaes.spotify.webapi.android.models.Image;
+import kaaes.spotify.webapi.android.models.PlaylistTrack;
+import kaaes.spotify.webapi.android.models.Track;
 
 
 /**
@@ -22,6 +25,7 @@ public class TrackItem {
     private long duration;
     private String album;
     private int initialPos;
+    private List<Image> images;
     private ArrayList<String> votes;
 
     private String youtubeId;
@@ -35,12 +39,13 @@ public class TrackItem {
 
 
     public TrackItem(Track apiTrack) {
-        this.trackId = apiTrack.getId();
-        this.name = apiTrack.getName();
-        this.duration = apiTrack.getDuration()/ 1000; // Duração no Spotify API é em milissegundos. Transformar em segundos.
-        this.album = apiTrack.getAlbum().getName();
+        this.trackId = apiTrack.id;
+        this.name = apiTrack.name;
+        this.duration = apiTrack.duration_ms / 1000; // Duração no Spotify API é em milissegundos. Transformar em segundos.
+        this.album = apiTrack.album.name;
         this.artists = getArtistsFromApi(apiTrack);
         this.votes = new ArrayList<String>();
+        this.images = apiTrack.album.images;
         this.wasCached = false;
     }
 
@@ -54,7 +59,7 @@ public class TrackItem {
         this.duration = duration;
         this.album = album;
         this.artists = artists;
-        this.votes = new ArrayList<String>();
+        this.votes = new ArrayList<>();
         this.wasCached = false;
     }
 
@@ -83,15 +88,13 @@ public class TrackItem {
     }
 
     public String getArtistsFromApi(Track apiTrack) {
-        List<SimpleArtist> apiList = apiTrack.getArtists();
-
-        Iterator iterator = apiList.iterator();
-
+        List<ArtistSimple> artists = apiTrack.artists;
+        Iterator iterator = artists.iterator();
         String artistsString = "";
 
         while (iterator.hasNext()) {
-            SimpleArtist simpleArtist = (SimpleArtist) iterator.next();
-            artistsString += simpleArtist.getName();
+            ArtistSimple artistSimple = (ArtistSimple) iterator.next();
+            artistsString += artistSimple.name;
             if (iterator.hasNext())
                 artistsString += ", ";
         }

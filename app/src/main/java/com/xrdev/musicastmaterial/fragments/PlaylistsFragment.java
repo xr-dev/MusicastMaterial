@@ -44,7 +44,7 @@ public class PlaylistsFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_playlists, container, false);
         setupViews(v);
-        loadPlaylists();
+        // debug_loadPlaylists();
         return v;
     }
 
@@ -66,6 +66,10 @@ public class PlaylistsFragment extends Fragment {
         mListener = null;
     }
 
+    public void setAdapter(PlaylistAdapter adapter){
+        mPlaylistAdapter = adapter;
+    }
+
     private void setupViews(View inflaterView){
         // Configurar o RecyclerView
         mPlaylistsRecyclerView = (RecyclerView) inflaterView.findViewById(R.id.rv_playlists);
@@ -73,15 +77,9 @@ public class PlaylistsFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mPlaylistsRecyclerView.setLayoutManager(mLayoutManager);
         mPlaylistsRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
-        mPlaylistAdapter = new PlaylistAdapter(mListener);
         mPlaylistsRecyclerView.setAdapter(mPlaylistAdapter);
         mPlaylistsRecyclerView.setNestedScrollingEnabled(false);
     }
 
-    private void loadPlaylists(){
-        for (int i = 0; i < 30; i++){
-            mPlaylistAdapter.add(new PlaylistItem("Debug " + i, 99, "idteste", "ownerid"));
-        }
-    }
 
 }

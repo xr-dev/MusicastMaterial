@@ -1,5 +1,7 @@
 package com.xrdev.musicastmaterial.models;
 
+import kaaes.spotify.webapi.android.models.PlaylistSimple;
+
 /**
  * Created by Guilherme on 11/04/2016.
  */
@@ -8,12 +10,15 @@ public class PlaylistItem {
     private int numTracks;
     private String playlistId;
     private String ownerId;
+    private String imageUrl;
 
-    public PlaylistItem(String name, int numTracks, String playlistId, String ownerId) {
-        this.name = name;
-        this.numTracks = numTracks;
-        this.playlistId = playlistId;
-        this.ownerId = ownerId;
+    public PlaylistItem(PlaylistSimple apiPlaylist) {
+        this.name = apiPlaylist.name;
+        this.numTracks = apiPlaylist.tracks.total;
+        this.playlistId = apiPlaylist.id;
+        this.ownerId = apiPlaylist.owner.id;
+        if (apiPlaylist.images.size() >= 1)
+            this.imageUrl = apiPlaylist.images.get(0).url;
     }
 
     public String getName() {
@@ -50,6 +55,10 @@ public class PlaylistItem {
 
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
 }

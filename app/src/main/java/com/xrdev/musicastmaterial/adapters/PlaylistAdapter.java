@@ -1,11 +1,14 @@
 package com.xrdev.musicastmaterial.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.xrdev.musicastmaterial.R;
 import com.xrdev.musicastmaterial.interfaces.IPlaylist;
 import com.xrdev.musicastmaterial.models.PlaylistItem;
@@ -21,15 +24,18 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     private List<PlaylistItem> mPlaylists = new ArrayList<PlaylistItem>();
     private final static String TAG = "PlaylistAdapter";
     IPlaylist mListener; // Callback para Activity
+    Context mContext; // Necessário para o Glide. Obter no onCreateViewHolder
 
     class PlaylistHolder extends RecyclerView.ViewHolder {
         TextView titleView;
         TextView tracksView;
+        ImageView imageView;
 
         public PlaylistHolder(View itemView){
             super(itemView);
             titleView = (TextView) itemView.findViewById(R.id.text_playlist_name);
             tracksView = (TextView) itemView.findViewById(R.id.text_playlist_num_tracks);
+            imageView = (ImageView) itemView.findViewById(R.id.image_playlist);
         }
 
         /**
@@ -59,7 +65,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
      */
     @Override
     public PlaylistAdapter.PlaylistHolder onCreateViewHolder(ViewGroup parent,int viewType){
-        View v = LayoutInflater.from(parent.getContext())
+        mContext = parent.getContext();
+        View v = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_playlist, parent, false);
 
         PlaylistHolder holder = new PlaylistHolder(v);
@@ -77,8 +84,15 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         // - replace the contents of the view with that element
         holder.bind(mPlaylists.get(position), mListener);
 
+        if (mPlaylists.get(position).getImageUrl() != null)
+            Glide.with(mContext)
+                    .load(mPlaylists.get(position).getImageUrl())
+                    .into(holder.imageView);
+        else {
+            Glide.clear(holder.imageView);
+            holder.imageView.setImageDrawable(mContext.getDrawable(R.drawable.bg_default_playlist_art));
+        }
     }
-
 
     // Adiciona um item a lista
     public void add(PlaylistItem item) {

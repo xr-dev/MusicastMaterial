@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
     defaultConfig {
@@ -36,10 +36,12 @@ dependencies {
     compile "com.android.support:mediarouter-v7:${supportLibVersion}"
     // Dependências Adicionais
 
-    compile('se.michaelthelin.spotify:spotify-web-api-java:1.5.0') {
-        exclude group: "commons-beanutils", module: "commons-beanutils"
-    }
-    compile 'commons-beanutils:commons-beanutils:20030211.134440'
+//    compile('se.michaelthelin.spotify:spotify-web-api-java:1.5.0') {
+//        exclude group: "commons-beanutils", module: "commons-beanutils"
+//    }
+//    compile 'commons-beanutils:commons-beanutils:20030211.134440'
+
+    compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
 
     // SpotifySDK - Autenticação e autorização
     compile 'com.spotify.sdk:spotify-auth:1.0.0-beta12@aar'

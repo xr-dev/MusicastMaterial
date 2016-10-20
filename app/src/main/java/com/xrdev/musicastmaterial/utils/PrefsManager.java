@@ -21,7 +21,10 @@ public class PrefsManager {
     private static final String KEY_CODE = "code";
     private static final String KEY_EXPIRATION_DATETIME = "expirationTime";
     private static final String KEY_UUID = "uuid";
-    
+
+
+    // TODO: Simplificar o PrefsManager com apenas dois métodos relativos ao Token. Mover a lógica para outras classes.
+
     public static void setCodeToPrefs(Context context, String code) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = prefs.edit();
@@ -37,14 +40,12 @@ public class PrefsManager {
 
     public static void setTokenToPrefs(Context context, Token token) {
         String accessString = token.getAccessString();
-        String refreshString = token.getRefreshString();
         DateTime expirationDt = token.getExpirationDt();
 
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putString(KEY_ACCESS_TOKEN, accessString);
-        editor.putString(KEY_REFRESH_TOKEN, refreshString);
         editor.putString(KEY_EXPIRATION_DATETIME, expirationDt.toString());
         editor.apply();
     }
@@ -60,10 +61,12 @@ public class PrefsManager {
     public static Token getTokenFromPrefs(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
         String accessString = prefs.getString(KEY_ACCESS_TOKEN, null);
-        String refreshString = prefs.getString(KEY_REFRESH_TOKEN, null);
         String expirationString = prefs.getString(KEY_EXPIRATION_DATETIME, null);
 
-        return new Token(accessString, refreshString, expirationString);
+        if (accessString == null || expirationString == null)
+            return null;
+        else
+            return new Token(accessString, expirationString);
     }
 
     public static String getAccessToken(Context context) {
@@ -71,21 +74,21 @@ public class PrefsManager {
         return prefs.getString(KEY_ACCESS_TOKEN, null);
     }
 
-    public static Token getValidToken(Context context) {
-        Token currentToken = getTokenFromPrefs(context);
-
-        if (currentToken.isValid()) {
-            return currentToken;
-        } else {
-            Token refreshedToken = SpotifyManager.getRefreshedToken(context);
-            if (refreshedToken == null) {
-                return null;
-            } else {
-                setTokenToPrefs(context, refreshedToken);
-                return refreshedToken;
-            }
-        }
-    }
+//    public static Token getValidToken(Context context) {
+//        Token currentToken = getTokenFromPrefs(context);
+//
+//        if (currentToken.isValid()) {
+//            return currentToken;
+//        } else {
+//            Token refreshedToken = SpotifyManager.getRefreshedToken(context);
+//            if (refreshedToken == null) {
+//                return null;
+//            } else {
+//                setTokenToPrefs(context, refreshedToken);
+//                return refreshedToken;
+//            }
+//        }
+//    }
 
     public static void clearPrefs(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
