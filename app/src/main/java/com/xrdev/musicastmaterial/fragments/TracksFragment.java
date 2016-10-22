@@ -44,7 +44,6 @@ public class TracksFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_tracks, container, false);
         setupViews(v);
-        loadTracks();
         return v;
     }
 
@@ -73,14 +72,11 @@ public class TracksFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mTracksRecyclerView.setLayoutManager(mLayoutManager);
         mTracksRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
-        mTracksAdapter = new TrackAdapter(mListener);
         mTracksRecyclerView.setAdapter(mTracksAdapter);
     }
 
-    private void loadTracks(){
-        for (int i = 0; i < 30; i++){
-            mTracksAdapter.add(new TrackItem("Debug Track " + i, 999, "Debug Album " + i, "Debug Artist " + i));
-        }
+    public void setAdapter(TrackAdapter adapter) {
+        mTracksAdapter = adapter;
     }
 
 }

@@ -11,6 +11,7 @@
     <string name="action_switch_to_solo">Enter Solo Mode</string>
     <string name="action_switch_to_party">Host a Party</string>
     <string name="action_logout">Logout from Spotify</string>
+    <string name="action_chromecast_button">Start Casting</string>
 
 
     <!-- Keys e protocolos -->

@@ -63,6 +63,8 @@ public class SpotifyManager {
 
         Log.d(TAG, "Total tracks:" + totalTracks);
         try {
+            api.setAccessToken(accessToken);
+
             final Pager<PlaylistTrack> tracksPage =
                     apiService.getPlaylistTracks(
                             playlist.getOwnerId(),

@@ -37,17 +37,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/top_container"
-        android:gravity="center|top"
+        android:gravity="center|fill_vertical"
         tools:context="com.xrdev.musicastmaterial.activities.BaseActivity">
 
         <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:scaleType="fitCenter"
             android:background="@android:color/transparent"
             android:id="@+id/imagebutton_play_pause"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_action_play"
+            android:src="@drawable/btn_overlay_play"
             android:contentDescription="@string/play_pause" />
 
         <ImageButton
@@ -58,10 +58,10 @@
             android:background="@android:color/transparent"
             android:id="@+id/imagebutton_next"
             android:src="@drawable/ic_action_next"
+            android:contentDescription="@string/next"
+            android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/imagebutton_play_pause"
-            android:layout_alignTop="@+id/imagebutton_play_pause"
-            android:layout_toRightOf="@+id/imagebutton_play_pause"
-            android:contentDescription="@string/next" />
+            android:layout_marginStart="20dp" />
 
         <ImageButton
             android:layout_width="40dp"
@@ -71,10 +71,11 @@
             android:background="@android:color/transparent"
             android:id="@+id/imagebutton_previous"
             android:src="@drawable/ic_action_previous"
-            android:layout_toStartOf="@+id/imagebutton_play_pause"
-            android:layout_alignTop="@+id/imagebutton_play_pause"
-            android:layout_toLeftOf="@+id/imagebutton_play_pause"
-            android:contentDescription="@string/previous" />
+            android:contentDescription="@string/previous"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_alignTop="@+id/imagebutton_next"
+            android:layout_toStartOf="@+id/imagebutton_play_pause" />
 
     </RelativeLayout>
 
@@ -93,8 +94,6 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:id="@+id/play_queue_list"
         android:layout_below="@id/play_queue_text"
         android:layout_alignParentBottom="true"

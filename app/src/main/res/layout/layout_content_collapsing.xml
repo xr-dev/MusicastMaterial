@@ -18,10 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginStart="20dp"
-            app:expandedTitleMarginEnd="40dp"
+            app:expandedTitleMarginEnd="20dp"
+            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Title"
             app:title="MusicastMaterial">
 
 
@@ -85,8 +85,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:foreground="@drawable/header_shadow"
-            android:layout_marginLeft="@dimen/fragment_margin"
-            android:layout_marginRight="@dimen/fragment_margin"
             android:id="@+id/frame_container">
         </FrameLayout>
 

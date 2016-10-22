@@ -8,7 +8,9 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -17,15 +19,18 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-
 import com.bumptech.glide.Glide;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -33,6 +38,7 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.xrdev.musicastmaterial.Application;
 import com.xrdev.musicastmaterial.R;
 import com.xrdev.musicastmaterial.adapters.PlaylistAdapter;
+import com.xrdev.musicastmaterial.adapters.TrackAdapter;
 import com.xrdev.musicastmaterial.apis.SpotifyManager;
 import com.xrdev.musicastmaterial.fragments.LoginFragment;
 import com.xrdev.musicastmaterial.fragments.TracksFragment;
@@ -66,10 +72,12 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     ImageView mToolbarArt;
 
     // Layout e Action Buttons
+
     CoordinatorLayout mCoordinatorLayout;
     FloatingActionMenu menuFab;
     FrameLayout mFrameContainer;
     ProgressBar mProgressBar;
+    ProgressDialog pd;
     FloatingActionButton mFabAddToQueue;
     FloatingActionButton mFabSwapPlaylist;
     FloatingActionButton mFabBecomeHost;
@@ -78,6 +86,9 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     FloatingActionButton mFabLogout;
     FloatingActionButton mFabLogin;
     SlidingUpPanelLayout mSlidingUpLayout;
+
+    // Google Cast
+    CastContext mCastContext;
 
     //AsyncTasks
     AsyncTask mPlaylistsLoader;
@@ -95,6 +106,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     // Dados
     PlaylistItem mPlaylistSelected;
     PlaylistAdapter mPlaylistAdapter;
+    TrackAdapter mTrackAdapter;
 
     // Spotify Auth
     SpotifyManager mSpotifyManager;
@@ -110,6 +122,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         setContentView(R.layout.activity_base);
 
         mSpotifyManager = new SpotifyManager(getApplicationContext());
+        mCastContext = CastContext.getSharedInstance(this);
         initViews();
         initFragments();
         setupMenuFabAnim();
@@ -146,6 +159,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         mFabLogin = (FloatingActionButton) findViewById(R.id.fab_login);
         mAppBarLayout.setExpanded(false, false);
         mProgressBar.setVisibility(View.GONE);
+
         //mSlidingUpLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
     }
 
@@ -157,6 +171,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
      */
     public void initFragments(){
         mPlaylistAdapter = new PlaylistAdapter(this);
+        mTrackAdapter = new TrackAdapter(this);
 
         mFragmentManager = getFragmentManager();
 
@@ -167,6 +182,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
 
         if (mTracksFragment == null) {
             mTracksFragment = TracksFragment.newInstance();
+            mTracksFragment.setAdapter(mTrackAdapter);
         }
 
         if (mLoginFragment == null) {
@@ -249,6 +265,32 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         // TODO: incluir a lógica para mostrar os botões corretos de acordo com Host/Guest e Mode.
         menuFab.addMenuButton(mFabBecomeHost);
     }
+
+    public static ProgressDialog createProgressDialog(Context mContext) {
+        ProgressDialog dialog = new ProgressDialog(mContext);
+        try {
+            dialog.show();
+        } catch (WindowManager.BadTokenException e) {
+
+        }
+        dialog.setCancelable(false);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.setContentView(R.layout.progressdialog);
+        // dialog.setMessage(Message);
+        return dialog;
+    }
+
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
+        CastButtonFactory.setUpMediaRouteButton(getApplicationContext(),
+                menu,
+                R.id.media_route_menu_item);
+        return true;
+    }
+
+
+
     /**
      * --------------------------------------------------------------------------------------------
      * IMPLEMENTAÇÃO DAS INTERAÇÕES COM FRAGMENTS
@@ -334,8 +376,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         setupMenuFabButtons();
         switchFragment(mPlaylistsFragment);
         if (!hasLoadedPlaylists)
-            mPlaylistsLoader = new PlaylistLoader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
-
+            mPlaylistsLoader = new PlaylistsLoader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
     }
 
     private void showTracksFragment(){
@@ -344,14 +385,19 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         menuFab.addMenuButton(mFabAddToQueue);
         menuFab.addMenuButton(mFabSwapPlaylist);
         switchFragment(mTracksFragment);
-        Glide.with(this)
-                .load("https://mosaic.scdn.co/640/134cd5ccaef9d411eba33df9542db9ba731aaf98c4b4399d9b7c6f61b6a6ee70c616bc1a985c7ab8e337f3661f68bc4d96a554de0ad7988d65edb25aec04f9acee17a7576f939eb5aa317d20c6322494")
-                .into(mToolbarArt);
+        if (mPlaylistSelected != null) {
 
-        Glide.with(this)
-                .load("https://mosaic.scdn.co/640/134cd5ccaef9d411eba33df9542db9ba731aaf98c4b4399d9b7c6f61b6a6ee70c616bc1a985c7ab8e337f3661f68bc4d96a554de0ad7988d65edb25aec04f9acee17a7576f939eb5aa317d20c6322494")
-                .bitmapTransform(new BlurTransformation(this, Application.GLIDE_BLUR_RADIUS))
-                .into(mToolbarBackground);
+            Glide.with(this)
+                    .load(mPlaylistSelected.getImageUrl())
+                    .into(mToolbarArt);
+
+            Glide.with(this)
+                    .load(mPlaylistSelected.getImageUrl())
+                    .bitmapTransform(new BlurTransformation(this, Application.GLIDE_BLUR_RADIUS))
+                    .into(mToolbarBackground);
+            mTracksLoader = new TracksLoader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,"");
+        }
+
     }
 
     private void showLoginFragment(){
@@ -427,53 +473,60 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
      * AsyncTasks necessários para carregamento de informações fora da UI Thread.
      * --------------------------------------------------------------------------------------------
      */
-    public class PlaylistLoader extends AsyncTask<String, Integer, ArrayList<PlaylistItem>>{
+    public class PlaylistsLoader extends AsyncTask<String, Integer, ArrayList<PlaylistItem>>{
         int playlistsCount;
         Token token;
         ArrayList<PlaylistItem> playlists;
-        public PlaylistLoader(){
+        public PlaylistsLoader(){
             super();
         }
         @Override
         protected void onPreExecute(){
             token = PrefsManager.getTokenFromPrefs(getApplicationContext());
             mProgressBar.setVisibility(View.VISIBLE);
+            pd = createProgressDialog(BaseActivity.this);
+            pd.setMessage(getString((R.string.pd_loading)));
+            pd.show();
+            mPlaylistAdapter.clear();
         }
         @Override
         protected ArrayList<PlaylistItem> doInBackground(String... args){
             if (token == null || !token.isValid()) // Token inexistente ou inválido.
                 return null;
-            else { // Token válido
-                mSpotifyManager.setAccessToken(token);
-                mRequestOffset = 0;
-                playlistsCount = mSpotifyManager.getUserPlaylistsCount();
-                Log.d(TAG, "Total de Playlists: " + playlistsCount);
 
-                while (mRequestOffset < playlistsCount) {
-                    playlists = mSpotifyManager.getUserPlaylists(REQUEST_LIMIT, mRequestOffset);
-                    if (isCancelled())
-                        break;
-                    mRequestOffset += REQUEST_LIMIT;
-                    publishProgress(mRequestOffset);
-                }
-                return playlists;
+            mSpotifyManager.setAccessToken(token);
+            mRequestOffset = 0;
+            playlistsCount = mSpotifyManager.getUserPlaylistsCount();
+            Log.d(TAG, "Total de Playlists: " + playlistsCount);
+
+            while (mRequestOffset < playlistsCount) {
+                playlists = mSpotifyManager.getUserPlaylists(REQUEST_LIMIT, mRequestOffset);
+                if (isCancelled())
+                    break;
+                mRequestOffset += REQUEST_LIMIT;
+                publishProgress(mRequestOffset);
             }
+            return playlists;
         }
         @Override
         protected void onProgressUpdate(Integer... progress){
             super.onProgressUpdate(progress);
             mProgressBar.setMax(playlistsCount);
             mProgressBar.setProgress(mRequestOffset);
+            if (pd.isShowing())
+                pd.dismiss();
             for (PlaylistItem item : playlists) {
                     mPlaylistAdapter.add(item);
             }
-
+            hasLoadedPlaylists = true;
         }
 
         @Override
         protected void onPostExecute(ArrayList<PlaylistItem> items) {
             super.onPostExecute(items);
             mProgressBar.setVisibility(View.GONE);
+            if (pd.isShowing())
+                pd.dismiss();
             if (items == null) { // Resultado null por algum motivo - falha no Token.
                 if (token == null && (!hasSkippedLogin || isAdmin()))
                     // Token inexistente, usuário não pulou login ou é o Admin (login obrigatório)
@@ -481,35 +534,81 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
                 if (token != null && !token.isValid())
                     // Token existente, mas expirado. Tentar obter novo token automaticamente pela API.
                     onLoginButtonPressed();
+            } else {
+                hasLoadedPlaylists = true;
             }
-            hasLoadedPlaylists = true;
-
         }
     }
 
-//    public class AsyncLogin extends AsyncTask<Void, Void, Void>{
-//        ProgressDialog pd;
-//        public AsyncLogin(){
-//            super();
-//        }
-//        @Override
-//        protected void onPreExecute(){
-//            pd = new ProgressDialog(BaseActivity.this);
-//            pd.show();
-//        }
-//        @Override
-//        protected Void doInBackground(Void... params){
-//            SpotifyManager.setAuthCredentials(getApplication());
-//            return null;
-//        }
-//        @Override
-//        protected void onPostExecute(){
-//            super.onPostExecute(null);
-//            if (pd.isShowing()) {
-//                pd.dismiss();
-//            }
-//        }
-//
-//    }
+    public class TracksLoader extends AsyncTask<String, Integer, ArrayList<TrackItem>>{
+        int tracksCount;
+        int tracksChecked;
+        Token token;
+        ArrayList<TrackItem> tracks;
+        public TracksLoader(){
+            super();
+        }
+        @Override
+        protected void onPreExecute(){
+            token = PrefsManager.getTokenFromPrefs(getApplicationContext());
+            mProgressBar.setVisibility(View.VISIBLE);
+            pd = createProgressDialog(BaseActivity.this);
+            pd.setMessage(getString((R.string.pd_loading)));
+            pd.show();
+            mTrackAdapter.clear();
+        }
+        @Override
+        protected ArrayList<TrackItem> doInBackground(String... args){
+            if (token == null || !token.isValid() || mPlaylistSelected == null) // Token inválido, nenhuma playlist selecionada.
+                return null;
+
+            mSpotifyManager.setAccessToken(token);
+            mRequestOffset = 0;
+            tracksCount = mPlaylistSelected.getNumTracksInt();
+            Log.d(TAG, "Total de Músicas na Playlist: " + tracksCount);
+
+            while (mRequestOffset < tracksCount) {
+                tracks = mSpotifyManager.getPlaylistTracks(mPlaylistSelected, REQUEST_LIMIT, mRequestOffset);
+                if (isCancelled()){
+                    mTrackAdapter.clear();
+                    break;
+                }
+                mRequestOffset += REQUEST_LIMIT;
+                publishProgress(mRequestOffset);
+            }
+            return tracks;
+
+        }
+        @Override
+        protected void onProgressUpdate(Integer... progress){
+            super.onProgressUpdate(progress);
+            mProgressBar.setMax(tracksCount);
+            mProgressBar.setSecondaryProgress(mRequestOffset);
+            mProgressBar.setProgress(tracksChecked);
+            if (pd.isShowing())
+                pd.dismiss();
+            for (TrackItem item : tracks) {
+                mTrackAdapter.add(item);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<TrackItem> items) {
+            super.onPostExecute(items);
+            mProgressBar.setVisibility(View.GONE);
+            if (pd.isShowing())
+                pd.dismiss();
+            if (items == null) { // Resultado null por algum motivo - falha no Token.
+                if (token == null && (!hasSkippedLogin || isAdmin()))
+                    // Token inexistente, usuário não pulou login ou é o Admin (login obrigatório)
+                    showLoginFragment();
+                if (token != null && !token.isValid())
+                    // Token existente, mas expirado. Tentar obter novo token automaticamente pela API.
+                    //(O app vai retornar para a View de Playlists ao final do método)
+                    onLoginButtonPressed();
+            }
+        }
+    }
+
 
 }
