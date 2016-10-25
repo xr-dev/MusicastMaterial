@@ -15,6 +15,8 @@ import com.xrdev.musicastmaterial.models.TrackItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import kaaes.spotify.webapi.android.models.Track;
+
 /**
  * Created by Guilherme on 13/07/2016.
  */
@@ -122,5 +124,9 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackHolder>
     @Override
     public long getItemId(int pos) {
         return pos;
+    }
+
+    public TrackItem getItem(int pos) {
+        return mTracks.get(pos);
     }
 }

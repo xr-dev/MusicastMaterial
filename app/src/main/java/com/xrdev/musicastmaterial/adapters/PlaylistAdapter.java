@@ -49,7 +49,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    View sharedView =  imageView;
                     listener.onPlaylistSelected(item);
+
                 }
             });
         }

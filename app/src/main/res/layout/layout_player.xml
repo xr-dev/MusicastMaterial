@@ -22,7 +22,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/playing_track_container"
             android:layout_width="match_parent"
-            android:layout_height="59dp"
+            android:layout_height="@dimen/sliding_panel_height"
             android:gravity="center|top"
             tools:context="com.xrdev.musicastmaterial.activities.BaseActivity">
 

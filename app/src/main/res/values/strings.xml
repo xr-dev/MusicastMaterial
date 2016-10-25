@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">MusicastMaterial</string>
+    <string name="app_name">Musicast</string>
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_playlists">Playlists</string>
     <string name="title_activity_base">Musicast</string>
+
 
     <!-- Menu -->
     <string name="action_become_host">Become Host</string>
@@ -16,9 +17,9 @@
 
     <!-- Keys e protocolos -->
     <string name="cast_app_id">E7378308</string>
-    <string name="cast_app_id_smr">E3FA9FF0</string>
+    <string name="cast_app_id_material">5BDB9915</string>
+    <string name="cast_app_id_test">D9331262</string>
     <string name="cast_channel_namespace">urn:x-cast:com.xrdev.musicast</string>
-
 
     <!-- Demais Strings -->
     <string name="pd_loading">Loading</string>
@@ -29,8 +30,11 @@
     <string name="login_required_for_admin">To use Solo Mode or Host a Party, you need to login with your Spotify Account.</string>
     <string name="login_optional_for_guest">To add new tracks to the Play Queue, you need to login with your Spotify Account. \n\n You can skip login authentication and just vote on tracks as a Guest in Party Mode.</string>
 
+    <string name="bullet_separator">" "</string>
+
     <string name="tracks">" tracks"</string>
-    <string name="videos_found">" videos found"</string>
+    <string name="tracks_caps">" TRACKS"</string>
+    <string name="videos_caps">" VIDEOS"</string>
 
     <string name="add_all_tracks_to_queue">"Add all tracks"</string>
     <string name="replace_all_tracks">"Replace all tracks"</string>
@@ -47,7 +51,7 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
 
-    <string name="play_queue">PLAY QUEUE</string>
+    <string name="play_queue">NEXT SONGS</string>
 
     <string name="btn_solo_mode">SOLO MODE</string>
     <string name="btn_host_party">HOST PARTY</string>

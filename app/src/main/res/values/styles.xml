@@ -9,6 +9,9 @@
         <item name="android:colorBackground">@color/background_material_dark_musicast</item>
         <item name="android:statusBarColor">@color/colorPrimaryDarkTransparent</item>
         <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowContentTransitions">true</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">

@@ -10,14 +10,16 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -26,6 +28,8 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -40,12 +44,14 @@ import com.xrdev.musicastmaterial.R;
 import com.xrdev.musicastmaterial.adapters.PlaylistAdapter;
 import com.xrdev.musicastmaterial.adapters.TrackAdapter;
 import com.xrdev.musicastmaterial.apis.SpotifyManager;
+import com.xrdev.musicastmaterial.apis.YouTubeManager;
 import com.xrdev.musicastmaterial.fragments.LoginFragment;
 import com.xrdev.musicastmaterial.fragments.TracksFragment;
 import com.xrdev.musicastmaterial.interfaces.ILogin;
 import com.xrdev.musicastmaterial.interfaces.IPlaylist;
 import com.xrdev.musicastmaterial.fragments.PlaylistsFragment;
 import com.xrdev.musicastmaterial.interfaces.ITrack;
+import com.xrdev.musicastmaterial.models.LocalQueue;
 import com.xrdev.musicastmaterial.models.PlaylistItem;
 import com.xrdev.musicastmaterial.models.Token;
 import com.xrdev.musicastmaterial.models.TrackItem;
@@ -55,7 +61,7 @@ import java.util.ArrayList;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
-public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin {
+public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack, ILogin {
 
     final static String TAG = "MusicastMaterial";
 
@@ -70,6 +76,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     AppBarLayout mAppBarLayout;
     ImageView mToolbarBackground;
     ImageView mToolbarArt;
+    Toolbar mToolbar;
 
     // Layout e Action Buttons
 
@@ -86,6 +93,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     FloatingActionButton mFabLogout;
     FloatingActionButton mFabLogin;
     SlidingUpPanelLayout mSlidingUpLayout;
+    TextView mAppbarInfo;
 
     // Google Cast
     CastContext mCastContext;
@@ -102,6 +110,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     boolean hasLoadedPlaylists = false;
     private static int REQUEST_LIMIT = 20;
     int mRequestOffset;
+    LocalQueue mLocalQueue;
 
     // Dados
     PlaylistItem mPlaylistSelected;
@@ -124,6 +133,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         mSpotifyManager = new SpotifyManager(getApplicationContext());
         mCastContext = CastContext.getSharedInstance(this);
         initViews();
+        // setToolbarMenu();
         initFragments();
         setupMenuFabAnim();
 
@@ -140,14 +150,16 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
      * Bind dos elementos de layout com os objetos
      * --------------------------------------------------------------------------------------------
      */
-    public void initViews(){
+    private void initViews(){
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_content);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mToolbarBackground = (ImageView) findViewById(R.id.appbar_background);
         mToolbarArt = (ImageView) findViewById(R.id.appbar_art);
         menuFab = (FloatingActionMenu) findViewById(R.id.menu_fab);
         mFrameContainer = (FrameLayout) findViewById(R.id.frame_container);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        mAppbarInfo = (TextView) findViewById(R.id.text_appbar_info);
         mProgressBar = (ProgressBar) findViewById(R.id.pbar_linear);
         mSlidingUpLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         mFabAddToQueue = (FloatingActionButton) findViewById(R.id.fab_add_pl_to_queue);
@@ -159,17 +171,26 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         mFabLogin = (FloatingActionButton) findViewById(R.id.fab_login);
         mAppBarLayout.setExpanded(false, false);
         mProgressBar.setVisibility(View.GONE);
+        setSupportActionBar(mToolbar);
+
+        // Fontes da Toolbar:
+        final Typeface tfProximaSemi = Typeface.createFromAsset(this.getAssets(), "fonts/ProximaNova-SemiBold.otf");
+        final Typeface tfProximaRegular = Typeface.createFromAsset(this.getAssets(), "fonts/ProximaNova-Regular.otf");
+        mCollapsingToolbarLayout.setExpandedTitleTypeface(tfProximaSemi);
+        mCollapsingToolbarLayout.setCollapsedTitleTypeface(tfProximaSemi);
+        mAppbarInfo.setTypeface(tfProximaRegular);
 
         //mSlidingUpLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
     }
 
+
     /**
      * --------------------------------------------------------------------------------------------
      * INICIALIZAÇÃO DOS FRAGMENTS
-     * Instancias de Fragments e inicialização de FragmentManager
+     * Instancias de Fragments, Transitions e inicialização de FragmentManager
      * --------------------------------------------------------------------------------------------
      */
-    public void initFragments(){
+    private void initFragments(){
         mPlaylistAdapter = new PlaylistAdapter(this);
         mTrackAdapter = new TrackAdapter(this);
 
@@ -202,6 +223,14 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
      */
     @Override
     public void onBackPressed(){
+
+        // Cancelar os Loaders caso estejam com algum load em andamento.
+        if (mPlaylistsLoader != null)
+            mPlaylistsLoader.cancel(true);
+        if (mTracksLoader != null)
+            mTracksLoader.cancel(true);
+        mProgressBar.setVisibility(View.GONE);
+
         if(mSlidingUpLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             mSlidingUpLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
@@ -217,14 +246,14 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         }
     }
 
-    public void collapseToolbar() {
+    private void collapseToolbar() {
         mAppBarLayout.setExpanded(false, true);
     }
 
     /**
      * Configura a animação customizada do Floating Action Button.
      */
-    public void setupMenuFabAnim() {
+    private void setupMenuFabAnim() {
 
         AnimatorSet set = new AnimatorSet();
 
@@ -259,19 +288,19 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     /**
      * Configura as opções padrão do Floating Action Button
      */
-    public void setupMenuFabButtons(){
+    protected void setupMenuFabButtons(){
         menuFab.close(true);
         menuFab.removeAllMenuButtons();
         // TODO: incluir a lógica para mostrar os botões corretos de acordo com Host/Guest e Mode.
         menuFab.addMenuButton(mFabBecomeHost);
     }
 
-    public static ProgressDialog createProgressDialog(Context mContext) {
+    protected static ProgressDialog createProgressDialog(Context mContext) {
         ProgressDialog dialog = new ProgressDialog(mContext);
         try {
             dialog.show();
         } catch (WindowManager.BadTokenException e) {
-
+            e.printStackTrace();
         }
         dialog.setCancelable(false);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -280,85 +309,16 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
         return dialog;
     }
 
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu, menu);
+
         CastButtonFactory.setUpMediaRouteButton(getApplicationContext(),
                 menu,
                 R.id.media_route_menu_item);
+
         return true;
-    }
-
-
-
-    /**
-     * --------------------------------------------------------------------------------------------
-     * IMPLEMENTAÇÃO DAS INTERAÇÕES COM FRAGMENTS
-     * --------------------------------------------------------------------------------------------
-     */
-
-    /**
-     * --------------------------------------------------------------------------------------------
-     * PLAYLISTSFRAGMENT - Fragment com as Playlists do usuário
-     * --------------------------------------------------------------------------------------------
-     */
-
-    /**
-     * Trata a seleção de uma Playlist no RecyclerView do PlaylistFragment.
-     * @param playlist playlist selecionada
-     */
-    public void onPlaylistSelected(PlaylistItem playlist){
-        Snackbar.make(mCoordinatorLayout, "DEBUG: Playlist selecionada " + playlist.getName(), Snackbar.LENGTH_LONG).show();
-        mPlaylistSelected = playlist;
-        showTracksFragment();
-    }
-
-    /**
-     * --------------------------------------------------------------------------------------------
-     * TRACKSFRAGMENT - Fragment com as músicas do usuário
-     * --------------------------------------------------------------------------------------------
-     */
-
-    /**
-     * Trata da seleção de uma Track no RecyclerView do TrackFragment.
-     * Este método é executado quando o usuário toca na linha da música e iniciará a reprodução da
-     * Playlist carregada na música selecionada. Funciona apenas no Modo Solo.
-     * @param track Música selecionada
-     */
-    public void onTrackSelected(TrackItem track) {
-        Snackbar.make(mCoordinatorLayout, "DEBUG: Track SELECIONADA: " + track.getName(), Snackbar.LENGTH_LONG).show();
-    }
-
-    /**
-     * Trata da interação do usuário com o botão de "Adicionar Música". Funciona no Modo Festa.
-     * @param track Música selecionada
-     */
-    public void onTrackAdded(TrackItem track) {
-        Snackbar.make(mCoordinatorLayout, "DEBUG: Track ADICIONADA: " + track.getName(), Snackbar.LENGTH_LONG).show();
-    }
-
-
-    /**
-     * --------------------------------------------------------------------------------------------
-     * LOGINFRAGMENT - Fragment para login no Spotify
-     * --------------------------------------------------------------------------------------------
-     */
-
-    public void onLoginButtonPressed(){
-        Snackbar.make(mCoordinatorLayout, "DEBUG: Botão de login pressionado", Snackbar.LENGTH_LONG).show();
-        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(SpotifyManager.CLIENT_ID,
-                AuthenticationResponse.Type.TOKEN,
-                REDIRECT_URI);
-
-        builder.setScopes(new String[]{"user-read-private", "playlist-read-private"});
-        AuthenticationRequest request = builder.build();
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-
-    }
-
-    public void onLoginSkipButtonPressed(){
-        Snackbar.make(mCoordinatorLayout, "DEBUG: Botão para pular login pressionado", Snackbar.LENGTH_LONG).show();
-        hasSkippedLogin = true;
     }
 
     /**
@@ -402,15 +362,14 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
 
     private void showLoginFragment(){
         mCollapsingToolbarLayout.setTitle(getString(R.string.title_spotify_login));
+        menuFab.setVisibility(View.GONE);
         switchFragment(mLoginFragment);
     }
 
     private void switchFragment(Fragment fragment){
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         transaction.replace(R.id.frame_container, fragment);
-        if (fragment instanceof TracksFragment)
-            mAppBarLayout.setExpanded(true);
-        else
+        if (!(fragment instanceof TracksFragment))
             collapseToolbar();
 
         if (!(fragment instanceof PlaylistsFragment))
@@ -418,6 +377,80 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
 
         transaction.commit();
     }
+
+
+    /**
+     * --------------------------------------------------------------------------------------------
+     * IMPLEMENTAÇÃO DAS INTERAÇÕES COM FRAGMENTS
+     * --------------------------------------------------------------------------------------------
+     */
+
+    /**
+     * --------------------------------------------------------------------------------------------
+     * PLAYLISTSFRAGMENT - Fragment com as Playlists do usuário
+     * --------------------------------------------------------------------------------------------
+     */
+
+    /**
+     * Trata a seleção de uma Playlist no RecyclerView do PlaylistFragment.
+     * @param playlist playlist selecionada
+     */
+    public void onPlaylistSelected(PlaylistItem playlist){
+        Snackbar.make(mCoordinatorLayout, "DEBUG: Playlist selecionada " + playlist.getName(), Snackbar.LENGTH_LONG).show();
+        mPlaylistSelected = playlist;
+
+        mLocalQueue = Application.getQueue(playlist.getPlaylistId());
+        showTracksFragment();
+    }
+
+    /**
+     * --------------------------------------------------------------------------------------------
+     * TRACKSFRAGMENT - Fragment com as músicas do usuário
+     * --------------------------------------------------------------------------------------------
+     */
+
+    /**
+     * Trata da seleção de uma Track no RecyclerView do TrackFragment.
+     * Este método é executado quando o usuário toca na linha da música e iniciará a reprodução da
+     * Playlist carregada na música selecionada. Funciona apenas no Modo Solo.
+     * @param track Música selecionada
+     */
+    public void onTrackSelected(TrackItem track) {
+        Snackbar.make(mCoordinatorLayout, "DEBUG: " + track.getName() + "; video: " + track.getYoutubeId(), Snackbar.LENGTH_LONG).show();
+    }
+
+    /**
+     * Trata da interação do usuário com o botão de "Adicionar Música". Funciona no Modo Festa.
+     * @param track Música selecionada
+     */
+    public void onTrackAdded(TrackItem track) {
+        Snackbar.make(mCoordinatorLayout, "DEBUG: Track ADICIONADA: " + track.getName(), Snackbar.LENGTH_LONG).show();
+    }
+
+
+    /**
+     * --------------------------------------------------------------------------------------------
+     * LOGINFRAGMENT - Fragment para login no Spotify
+     * --------------------------------------------------------------------------------------------
+     */
+
+    public void onLoginButtonPressed(){
+        Snackbar.make(mCoordinatorLayout, "DEBUG: Botão de login pressionado", Snackbar.LENGTH_LONG).show();
+        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(SpotifyManager.CLIENT_ID,
+                AuthenticationResponse.Type.TOKEN,
+                REDIRECT_URI);
+
+        builder.setScopes(new String[]{"user-read-private", "playlist-read-private"});
+        AuthenticationRequest request = builder.build();
+        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+
+    }
+
+    public void onLoginSkipButtonPressed(){
+        Snackbar.make(mCoordinatorLayout, "DEBUG: Botão para pular login pressionado", Snackbar.LENGTH_LONG).show();
+        hasSkippedLogin = true;
+    }
+
 
     /**
      * --------------------------------------------------------------------------------------------
@@ -543,6 +576,7 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
     public class TracksLoader extends AsyncTask<String, Integer, ArrayList<TrackItem>>{
         int tracksCount;
         int tracksChecked;
+        int foundCount;
         Token token;
         ArrayList<TrackItem> tracks;
         public TracksLoader(){
@@ -556,17 +590,21 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
             pd.setMessage(getString((R.string.pd_loading)));
             pd.show();
             mTrackAdapter.clear();
+            mRequestOffset = 0;
+            tracksCount = mPlaylistSelected.getNumTracksInt();
+            mAppBarLayout.setExpanded(true);
         }
         @Override
         protected ArrayList<TrackItem> doInBackground(String... args){
             if (token == null || !token.isValid() || mPlaylistSelected == null) // Token inválido, nenhuma playlist selecionada.
                 return null;
 
+            // Inicializar variáveis
             mSpotifyManager.setAccessToken(token);
-            mRequestOffset = 0;
-            tracksCount = mPlaylistSelected.getNumTracksInt();
             Log.d(TAG, "Total de Músicas na Playlist: " + tracksCount);
 
+
+            // Recuperar músicas do Spotify
             while (mRequestOffset < tracksCount) {
                 tracks = mSpotifyManager.getPlaylistTracks(mPlaylistSelected, REQUEST_LIMIT, mRequestOffset);
                 if (isCancelled()){
@@ -574,21 +612,48 @@ public class BaseActivity extends Activity implements IPlaylist, ITrack, ILogin 
                     break;
                 }
                 mRequestOffset += REQUEST_LIMIT;
-                publishProgress(mRequestOffset);
+                publishProgress(0); // Indicará ao onProgressUpdate que a música deve ser adicionada ao Adapter.
+            }
+
+            // Procurar vídeos correspondentes
+            for (int i = 0; i < mTrackAdapter.getItemCount(); i++) {
+                if(isCancelled())
+                    break;
+
+                TrackItem currentItem = mTrackAdapter.getItem(i);
+                if (!currentItem.wasCached || !currentItem.wasFound()) {
+                    if (YouTubeManager.queryVideo(getApplicationContext(), currentItem, mLocalQueue))
+                        foundCount++;
+                } else
+                    foundCount++;
+                tracksChecked++;
+                publishProgress(1); // Música já estava no Adapter e não deve ser adicionada novamente.
+            }
+
+            // Atualizar as correspondências antigas.
+            for (int i = 0; i < mTrackAdapter.getItemCount(); i++) {
+                if(isCancelled())
+                    break;
+                TrackItem currentItem = mTrackAdapter.getItem(i);
+                if (currentItem.isRefreshNeeded())
+                    YouTubeManager.queryVideo(getApplication(), currentItem, mLocalQueue);
             }
             return tracks;
-
         }
         @Override
         protected void onProgressUpdate(Integer... progress){
             super.onProgressUpdate(progress);
+            mTrackAdapter.notifyDataSetChanged();
             mProgressBar.setMax(tracksCount);
             mProgressBar.setSecondaryProgress(mRequestOffset);
             mProgressBar.setProgress(tracksChecked);
+            mAppbarInfo.setText(tracksCount + getString(R.string.tracks_caps) + " • " + foundCount + getString(R.string.videos_caps));
             if (pd.isShowing())
                 pd.dismiss();
-            for (TrackItem item : tracks) {
-                mTrackAdapter.add(item);
+            if (progress[0] == 0) { // onProgressUpdate chamado quando as músicas foram recuperadas do Spotify.
+                for (TrackItem item : tracks) {
+                    mTrackAdapter.add(item);
+                }
             }
         }
 

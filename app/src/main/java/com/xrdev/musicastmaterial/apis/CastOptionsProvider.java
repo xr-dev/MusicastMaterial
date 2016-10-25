@@ -15,14 +15,10 @@ import java.util.List;
  * Classe que fornece as opções para instanciar o Singleton CastContext, necessária para o Cast SDK
  */
 class CastOptionsProvider implements OptionsProvider {
-
     @Override
     public CastOptions getCastOptions(Context appContext) {
-        List<String> supportedNamespaces = new ArrayList<>();
-        supportedNamespaces.add(appContext.getString(R.string.cast_channel_namespace));
         CastOptions castOptions = new CastOptions.Builder()
-                .setReceiverApplicationId(appContext.getString(R.string.cast_app_id))
-                .setSupportedNamespaces(supportedNamespaces)
+                .setReceiverApplicationId(appContext.getString(R.string.cast_app_id_material))
                 .build();
         return castOptions;
     }
@@ -31,3 +27,4 @@ class CastOptionsProvider implements OptionsProvider {
         return null;
     }
 }
+

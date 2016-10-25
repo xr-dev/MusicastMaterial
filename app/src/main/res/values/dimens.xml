@@ -8,7 +8,7 @@
     <dimen name="app_bar_collapsed_height">50dp</dimen>
     <dimen name="app_bar_tracks_height">250dp</dimen>
     <dimen name="app_bar_collapsible_height">180dp</dimen>
-    <dimen name="app_bar_image_height">150dp</dimen>
+    <dimen name="app_bar_image_height">140dp</dimen>
 
     <!-- SLIDING PANEL -->
     <dimen name="sliding_panel_height">60dp</dimen>

@@ -43,11 +43,19 @@
 
                 <ImageView
                     android:id="@+id/appbar_art"
+                    android:layout_marginTop="15dp"
                     android:layout_width="@dimen/app_bar_image_height"
                     android:layout_height="@dimen/app_bar_image_height"
                     android:scaleType="centerCrop"
                     android:src="@drawable/bg_default_playlist_art"
                      />
+                <TextView
+                    android:id="@+id/text_appbar_info"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"/>
 
             </LinearLayout>
 
