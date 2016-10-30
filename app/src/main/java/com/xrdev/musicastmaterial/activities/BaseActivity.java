@@ -33,8 +33,14 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.cast.Cast;
+import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.Session;
+import com.google.android.gms.cast.framework.SessionManager;
+import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -55,13 +61,16 @@ import com.xrdev.musicastmaterial.models.LocalQueue;
 import com.xrdev.musicastmaterial.models.PlaylistItem;
 import com.xrdev.musicastmaterial.models.Token;
 import com.xrdev.musicastmaterial.models.TrackItem;
+import com.xrdev.musicastmaterial.utils.JsonConverter;
 import com.xrdev.musicastmaterial.utils.PrefsManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
-public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack, ILogin {
+public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack, ILogin,
+        Cast.MessageReceivedCallback, SessionManagerListener  {
 
     final static String TAG = "MusicastMaterial";
 
@@ -97,6 +106,10 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
 
     // Google Cast
     CastContext mCastContext;
+    SessionManager mSessionManager;
+    CastSession mCastSession;
+    String mCastNamespace;
+    JsonConverter json = new JsonConverter(this);
 
     //AsyncTasks
     AsyncTask mPlaylistsLoader;
@@ -111,6 +124,7 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
     private static int REQUEST_LIMIT = 20;
     int mRequestOffset;
     LocalQueue mLocalQueue;
+    String mAdmin;
 
     // Dados
     PlaylistItem mPlaylistSelected;
@@ -132,6 +146,8 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
 
         mSpotifyManager = new SpotifyManager(getApplicationContext());
         mCastContext = CastContext.getSharedInstance(this);
+        mCastNamespace = getString(R.string.cast_channel_namespace);
+        mSessionManager = mCastContext.getSessionManager();
         initViews();
         // setToolbarMenu();
         initFragments();
@@ -142,6 +158,26 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
         showPlaylistsFragment();
         //showLoginFragment();
 
+    }
+
+    @Override
+    protected void onResume() {
+        try {
+            mCastSession = mSessionManager.getCurrentCastSession();
+            mSessionManager.addSessionManagerListener(this);
+            if (mCastSession != null)
+                mCastSession.setMessageReceivedCallbacks(mCastNamespace, this);
+        } catch (IOException e) {
+            Log.e(TAG, "Exception criando o Channel", e);
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSessionManager.removeSessionManagerListener(this);
+        mCastSession = null;
     }
 
     /**
@@ -331,7 +367,7 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
     /**
      * Configura interface e toolbar (título, fundo e botões) para a View de tracks de uma playlist.
      */
-    private void showPlaylistsFragment(){
+    public void showPlaylistsFragment(){
         mCollapsingToolbarLayout.setTitle(getString(R.string.title_activity_base));
         setupMenuFabButtons();
         switchFragment(mPlaylistsFragment);
@@ -376,6 +412,94 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
             transaction.addToBackStack(null);
 
         transaction.commit();
+    }
+
+
+    /**
+     * --------------------------------------------------------------------------------------------
+     * GOOGLE CAST
+     * Inicialização do Google Cast e tratamento de eventos de sessão
+     * --------------------------------------------------------------------------------------------
+     */
+
+    @Override
+    public void onMessageReceived(CastDevice castDevice, String namespace,
+                                  String message) {
+        Log.d(TAG, "onMessageReceived: " + message);
+        // TODO: desenvolver lógica.
+    }
+
+    private void sendMessage(String message){
+        if (mCastSession != null){
+            try {
+                mCastSession.sendMessage(mCastNamespace, message);
+            } catch (Exception e) {
+                Log.e(TAG, "Exception enviando mensagem", e);
+            }
+        }
+    }
+
+    @Override
+    public void onSessionStarted(Session session, String sessionId) {
+        invalidateOptionsMenu();
+        Log.d(TAG, "Cast Session Started");
+        try {
+            mCastSession = mSessionManager.getCurrentCastSession();
+            mCastSession.setMessageReceivedCallbacks(mCastNamespace, this);
+            sendMessage(json.makeGeneric(JsonConverter.TYPE_GET_STATUS));
+        } catch (IOException e) {
+            Log.e(TAG,"Erro no onSessionStarted " + e);
+        }
+
+    }
+
+    @Override
+    public void onSessionResumed(Session session, boolean wasSuspended) {
+        invalidateOptionsMenu();
+        Log.d(TAG, "Cast Session Resumed");
+        try {
+            mCastSession = mSessionManager.getCurrentCastSession();
+            mCastSession.setMessageReceivedCallbacks(mCastNamespace, this);
+            sendMessage(json.makeGeneric(JsonConverter.TYPE_GET_STATUS));
+        } catch (IOException e) {
+            Log.e(TAG,"Erro no onSessionStarted " + e);
+        }
+    }
+
+    @Override
+    public void onSessionEnded(Session session, int error) {
+        Log.d(TAG, "Cast Session Ended");
+        mCastSession = null;
+    }
+
+    @Override
+    public void onSessionStarting(Session session) {
+        Log.d(TAG, "Cast Session Starting");
+    }
+
+    @Override
+    public void onSessionStartFailed(Session session, int i) {
+        Log.d(TAG, "Cast Session Start Failed");
+    }
+
+    @Override
+    public void onSessionEnding(Session session) {
+        Log.d(TAG, "Cast Session Ending");
+    }
+
+    @Override
+    public void onSessionResuming(Session session, String s) {
+        Log.d(TAG, "Cast Session Resuming");
+    }
+
+    @Override
+    public void onSessionResumeFailed(Session session, int i) {
+        Log.d(TAG, "Cast Session Resume Failed");
+    }
+
+    @Override
+    public void onSessionSuspended(Session session, int i) {
+        Log.d(TAG, "Cast Session Suspended");
     }
 
 
@@ -455,12 +579,17 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
     /**
      * --------------------------------------------------------------------------------------------
      * LÓGICA
-     * Lógica e controles da aplicação
+     * Lógica da aplicação
      * --------------------------------------------------------------------------------------------
      */
     private boolean isAdmin(){
-        // TODO: construir lógica
-        return false;
+        if (mAdmin == null)
+            return false;
+        return mAdmin.equals(PrefsManager.getUUID(this));
+    }
+
+    public String getAdmin(){
+        return mAdmin;
     }
 
     /**
@@ -593,6 +722,7 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
             mRequestOffset = 0;
             tracksCount = mPlaylistSelected.getNumTracksInt();
             mAppBarLayout.setExpanded(true);
+            mAppbarInfo.setVisibility(View.INVISIBLE);
         }
         @Override
         protected ArrayList<TrackItem> doInBackground(String... args){
@@ -602,7 +732,6 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
             // Inicializar variáveis
             mSpotifyManager.setAccessToken(token);
             Log.d(TAG, "Total de Músicas na Playlist: " + tracksCount);
-
 
             // Recuperar músicas do Spotify
             while (mRequestOffset < tracksCount) {
@@ -647,6 +776,7 @@ public class BaseActivity extends AppCompatActivity implements IPlaylist, ITrack
             mProgressBar.setMax(tracksCount);
             mProgressBar.setSecondaryProgress(mRequestOffset);
             mProgressBar.setProgress(tracksChecked);
+            mAppbarInfo.setVisibility(View.VISIBLE);
             mAppbarInfo.setText(tracksCount + getString(R.string.tracks_caps) + " • " + foundCount + getString(R.string.videos_caps));
             if (pd.isShowing())
                 pd.dismiss();

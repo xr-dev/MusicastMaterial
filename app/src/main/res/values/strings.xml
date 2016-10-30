@@ -27,8 +27,8 @@
     <string name="title_spotify_login">Log in to Spotify</string>
     <string name="btn_login">LOG IN TO SPOTIFY</string>
     <string name="btn_skip_login">SKIP LOGIN</string>
-    <string name="login_required_for_admin">To use Solo Mode or Host a Party, you need to login with your Spotify Account.</string>
-    <string name="login_optional_for_guest">To add new tracks to the Play Queue, you need to login with your Spotify Account. \n\n You can skip login authentication and just vote on tracks as a Guest in Party Mode.</string>
+    <string name="login_required_for_admin">To use Solo Mode or Host a Party, you need to login with your Spotify Account\n\n You will be logged in automatically if you have Spotify installed</string>
+    <string name="login_optional_for_guest">To add new tracks to the Play Queue, you need to login with your Spotify Account \n\n You can skip login authentication and just vote on tracks as a Guest in Party Mode</string>
 
     <string name="bullet_separator">" "</string>
 
@@ -105,8 +105,5 @@
     <string name="dlg_confirm_switch_to_party">Start hosting</string>
 
     <string name="dlg_cancel">Cancel</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
